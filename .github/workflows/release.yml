@@ -6,7 +6,7 @@ on:
       - v*
 
 env:
-  ARC_TOOLBOX_ZIP: ArcGIS-toolbox-${{ github.event.release.tag_name }}.zip
+  ARC_TOOLBOX_ZIP: ASF_ArcGIS_Toolbox_${{ github.event.release.tag_name }}.zip
 
 jobs:
   finish:
