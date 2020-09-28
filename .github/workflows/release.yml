@@ -18,7 +18,7 @@ jobs:
       - name: Zip ArcGIS Toolbox
         uses: montudor/action-zip@v0.1.0
         with:
-          args: zip -qq -r ArcGIS-toolbox-${{ github.event.release.tag_name }}.zip ArcGIS-toolbox
+          args: zip -qq -j -r ArcGIS-toolbox-${{ github.event.release.tag_name }}.zip ArcGIS-toolbox
 
       - name: Create Release
         uses: docker://antonyurchenko/git-release:latest
