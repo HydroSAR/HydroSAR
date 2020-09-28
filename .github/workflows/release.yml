@@ -5,6 +5,8 @@ on:
     tags:
       - v*
 
+env:
+  ARC_TOOLBOX_ZIP: ArcGIS-toolbox-${{ github.event.release.tag_name }}.zip
 
 jobs:
   finish:
@@ -18,7 +20,7 @@ jobs:
       - name: Zip ArcGIS Toolbox
         uses: montudor/action-zip@v0.1.0
         with:
-          args: zip -qq -j -r ArcGIS-toolbox-${{ github.event.release.tag_name }}.zip ArcGIS-toolbox
+          args: zip -qq -j -r ${{ env.ARC_TOOLBOX_ZIP }} ArcGIS-toolbox
 
       - name: Create Release
         uses: docker://antonyurchenko/git-release:latest
@@ -28,7 +30,7 @@ jobs:
           RELEASE_NAME_PREFIX: "GIS Tools "
         with:
           args: |
-            ArcGIS-toolbox-${{ github.event.release.tag_name }}.zip
+            ${{ env.ARC_TOOLBOX_ZIP }}
 
       - name: Attempt fast-forward develop from main
         run: |
