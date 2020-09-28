@@ -1,14 +1,9 @@
-name: Deploy to GitHub
+name: Tag new version
 
 on:
   push:
     branches:
       - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
 
 
   package:
@@ -23,7 +18,6 @@ on:
           token: ${{ secrets.TOOLS_BOT_PAK }}
 
       - name: Get associated PR
-        if: endsWith(github.ref, '/main')
         uses: helaili/github-graphql-action@2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
@@ -35,7 +29,6 @@ on:
           sha: ${{ github.sha }}
 
       - name: Get PR labels
-        if: endsWith(github.ref, '/main')
         uses: helaili/github-graphql-action@2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
@@ -46,10 +39,9 @@ on:
           name: GIS-tools
 
       - name: Upload a Build Artifact
-        if: endsWith(github.ref, '/main')
         uses: actions/upload-artifact@v2
         with:
-          name: query-responces
+          name: query-responses
           path: '*.json'
 
       - uses: actions/setup-python@v1
@@ -62,7 +54,6 @@ on:
           python -m pip install bump2version
 
       - name: Tag version
-        if: endsWith(github.ref, '/main')
         run: |
           git fetch origin +refs/tags/*:refs/tags/*
           git config user.email "UAF-asf-apd@alaska.edu"
@@ -80,9 +71,3 @@ on:
 
           git push --tags
           echo "Tagged version $(git describe --abbrev=0) and pushed back to repo"
-
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
