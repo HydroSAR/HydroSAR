@@ -8,7 +8,6 @@ on:
 jobs:
   tag:
     runs-on: ubuntu-latest
-    needs: pytest
     outputs:
       SDIST_VERSION:  ${{ steps.build.outputs.version }}
     steps:
