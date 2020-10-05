@@ -15,14 +15,15 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.TOOLS_BOT_PAK }}
 
-      - name: Get version
-        id: get_version
-        run: echo ::set-output name=ARC_FILE::ASF_ArcGIS_Toolbox_$(echo ${GITHUB_REF#refs/tags/}).zip
+      - name: Build release asset names
+        id: release_assets
+        run: |
+          echo ::set-output name=ARC_FILE::ASF_ArcGIS_Toolbox_$(echo ${GITHUB_REF#refs/tags/}).zip
 
       - name: Zip ArcGIS Toolbox
         uses: montudor/action-zip@v0.1.0
         with:
-          args: zip -qq -j -r ${{ steps.get_version.outputs.ARC_FILE }} ArcGIS-toolbox
+          args: zip -qq -j -r ${{ steps.release_assets.outputs.ARC_FILE }} ArcGIS-toolbox
 
       - name: Create Release
         uses: docker://antonyurchenko/git-release:latest
@@ -32,7 +33,7 @@ jobs:
           RELEASE_NAME_PREFIX: "GIS Tools "
         with:
           args: |
-            ${{ steps.get_version.outputs.ARC_FILE }}
+            ${{ steps.release_assets.outputs.ARC_FILE }}
 
       - name: Attempt fast-forward develop from main
         run: |
