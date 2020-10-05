@@ -1,4 +1,4 @@
-GIS-tools
+GIS Tools
 =========
 **_A collection of GIS tools for working with higher-level SAR products_**
 -----
