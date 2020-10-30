@@ -35,6 +35,14 @@ jobs:
           args: |
             ${{ steps.release_assets.outputs.ARC_FILE }}
 
+      - name: Trigger rebuild of HyP3 docs
+        uses: benc-uk/workflow-dispatch@v1.1
+        with:
+          workflow: Deploy to Github.io
+          token: ${{ secrets.TOOLS_BOT_PAK }}
+          repo: ASFHyP3/ASFHyP3
+          ref: main
+
       - name: Attempt fast-forward develop from main
         run: |
           git fetch --prune
