@@ -42,9 +42,8 @@ jobs:
       - name: Safety analysis of conda environment
         shell: bash -l {0}
         run: |
-          # Ignore Safety vulerability #38264, GDAL < 3.1, because GAMMA binaries are built against GDAL 2.*
-          python -m pip freeze | safety check --full-report -i 38264 --stdin
-          conda list --export | awk -F '=' '/^[^#]/ {print $1 "==" $2}' | safety check --full-report -i 38264 --stdin
+          python -m pip freeze | safety check --full-report --stdin
+          conda list --export | awk -F '=' '/^[^#]/ {print $1 "==" $2}' | safety check --full-report --stdin
 
 
   package:
