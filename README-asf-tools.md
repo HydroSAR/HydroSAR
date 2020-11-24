@@ -1,6 +1,6 @@
-GIS Tools
+ASF Tools
 =========
-**_A collection of GIS tools for working with higher-level SAR products_**
+**_A collection of tools for working with higher-level SAR products_**
 -----
 
 ## ArcGIS Toolbox

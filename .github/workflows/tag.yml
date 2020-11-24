@@ -24,7 +24,7 @@ jobs:
           query: .github/queries/asssociated-pr.query.yml
           outputFile: pr.json
           owner: ASFHyP3
-          name: GIS-tools
+          name: asf-tools
           sha: ${{ github.sha }}
 
       - name: Get PR labels
@@ -35,7 +35,7 @@ jobs:
           query: .github/queries/pr-labels.query.yml
           outputFile: labels.json
           owner: ASFHyP3
-          name: GIS-tools
+          name: asf-tools
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
