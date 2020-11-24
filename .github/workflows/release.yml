@@ -30,7 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
           ALLOW_TAG_PREFIX: "true"
-          RELEASE_NAME_PREFIX: "GIS Tools "
+          RELEASE_NAME_PREFIX: "ASF Tools "
         with:
           args: |
             ${{ steps.release_assets.outputs.ARC_FILE }}

@@ -34,4 +34,4 @@ or pull requests
 - [ ] Is the level of changes labeled appropriately?
 - [ ] Are all the changes described appropriately in `CHANGELOG.md`?
 - [ ] Has the documentation been adequately updated?
-- [ ] Are the test adequate?
+- [ ] Are the tests adequate?
