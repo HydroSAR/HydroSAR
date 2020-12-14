@@ -1,0 +1,6 @@
+include LICENSE
+include asf_tools/README.md
+
+graft asf_tools
+
+global-exclude *.py[cod] __pycache__ *.so

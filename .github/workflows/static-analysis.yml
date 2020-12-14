@@ -10,7 +10,7 @@ jobs:
 
       - uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Install dependencies
         run: |
@@ -20,7 +20,7 @@ jobs:
       - name: Lint with flake8
         run: |
           flake8 --max-line-length=120 --import-order-style=pycharm --statistics \
-              --application-import-names ArcGIS-toolbox/ASF_Tools.pyt
+              --application-import-names asf_tools ArcGIS-toolbox/ASF_Tools.pyt asf_tools
 
 
   gitleaks:
@@ -43,7 +43,7 @@ jobs:
 
       - uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Install dependencies
         run: |
