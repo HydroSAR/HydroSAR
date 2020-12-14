@@ -11,10 +11,11 @@ on:
       - develop
 
 env:
-  S3_PYPI_HOST: hyp3-pypi.s3-website-us-east-1.amazonaws.com
-  AWS_REGION: us-east-1
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  S3_PYPI_HOST: hyp3-pypi-west.s3-website-us-west-2.amazonaws.com
+  S3_PYPI_BUCKET: hyp3-pypi-west
+  AWS_REGION: us-west-2
+  AWS_ACCESS_KEY_ID: ${{ secrets.V2_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.V2_AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   pytest:
@@ -130,8 +131,8 @@ jobs:
           export SDIST_VERSION=$(python setup.py --version)
           echo "::set-output name=version::${SDIST_VERSION}"
           python setup.py sdist bdist_wheel
-          echo "Uploading version ${SDIST_VERSION} to S3-PyPI"
-          s3pypi --bucket hyp3-pypi --force --verbose
+          echo "Uploading version ${SDIST_VERSION} to ${S3_PYPI_BUCKET}"
+          s3pypi --bucket ${S3_PYPI_BUCKET} --private --force --verbose
 
       - name: Upload to PyPI.org
         if: github.ref == 'refs/heads/master'
