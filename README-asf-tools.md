@@ -4,7 +4,7 @@ ASF Tools
 -----
 
 ## ArcGIS Toolbox
-The ASF_Tools [ArcGIS Python Toolbox](ArcGIS-toolbox) can be used with either ArcGIS Desktop or 
+The [ArcGIS Python Toolbox](ArcGIS-toolbox) can be used with either ArcGIS Desktop or 
 ArcGIS Pro, and contains tools that perform geoprocessing tasks useful for working
 with Synthetic Aperture Radar (SAR) data. The tools were designed to be used with
 Radiometric Terrain Corrected (RTC) SAR datasets, such as those enerated by
@@ -35,7 +35,7 @@ and usage.
 
 ## Contact Us
 
-Want to talk about the `asf_tools`? We would love to hear from you!
+Want to talk about `ASF Tools`? We would love to hear from you!
 
 Found a bug? Want to request a feature?
 [open an issue](https://github.com/ASFHyP3/asf_tools/issues/new)
