@@ -35,7 +35,7 @@ and usage.
 
 ## Contact Us
 
-Want to talk about `ASF Tools`? We would love to hear from you!
+Want to talk about ASF Tools? We would love to hear from you!
 
 Found a bug? Want to request a feature?
 [open an issue](https://github.com/ASFHyP3/asf_tools/issues/new)
