@@ -18,6 +18,7 @@ jobs:
       - name: Build release asset names
         id: release_assets
         run: |
+          echo ::set-output name=version_tag::${GITHUB_REF#refs/tags/}
           echo ::set-output name=ARC_FILE::ASF_ArcGIS_Toolbox_$(echo ${GITHUB_REF#refs/tags/}).zip
 
       - name: Zip ArcGIS Toolbox
@@ -35,13 +36,14 @@ jobs:
           args: |
             ${{ steps.release_assets.outputs.ARC_FILE }}
 
-      - name: Trigger rebuild of HyP3 docs
+      - name: Bump ASF Tools version in HyP3 docs
         uses: benc-uk/workflow-dispatch@v1.1
         with:
-          workflow: Deploy to Github.io
+          workflow: Update ASF Tools version
           token: ${{ secrets.TOOLS_BOT_PAK }}
           repo: ASFHyP3/ASFHyP3
           ref: main
+          inputs: '{"asf_tools_version": "${{ steps.release_assets.outputs.version_tag }}"}'
 
       - name: Attempt fast-forward develop from main
         run: |
