@@ -40,12 +40,6 @@ jobs:
           python -m pip install .[develop]
           pytest --cov=asf_tools
 
-      - name: Safety analysis of conda environment
-        shell: bash -l {0}
-        run: |
-          python -m pip freeze | safety check --full-report --stdin
-          conda list --export | awk -F '=' '/^[^#]/ {print $1 "==" $2}' | safety check --full-report --stdin
-
 
   package:
     runs-on: ubuntu-latest
