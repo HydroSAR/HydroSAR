@@ -41,7 +41,7 @@ jobs:
         with:
           workflow: Update ASF Tools version
           token: ${{ secrets.TOOLS_BOT_PAK }}
-          repo: ASFHyP3/ASFHyP3
+          repo: ASFHyP3/hyp3-docs
           ref: main
           inputs: '{"asf_tools_version": "${{ steps.release_assets.outputs.version_tag }}"}'
 
