@@ -1,0 +1,6 @@
+#!/bin/bash
+# This file is used by Binder to install this repo into the binder environment
+#    https://mybinder.readthedocs.io/en/latest/using/config_files.html#postbuild-run-code-after-installing-the-environment
+# Notably, providing an environment.yml file means pip files (requirements.txt and setup.py) are ignored
+
+python -m pip install -e .[develop]
