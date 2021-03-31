@@ -1,0 +1,26 @@
+name: asf-tools
+channels:
+  - conda-forge
+  # - esri  # windows only
+  - nodefaults
+dependencies:
+  - python>=3.8
+  - pip
+  # For packaging, and testing
+  # - arcpy  # windows only
+  - flake8
+  - flake8-import-order
+  - flake8-blind-except
+  - flake8-builtins
+  - setuptools
+  - setuptools_scm
+  - wheel
+  - pytest
+  - pytest-console-scripts
+  - pytest-cov
+  # For running
+  - numpy
+  - gdal>=3.2.0
+  - pip:
+    # for packaging and testing
+    - s3pypi
