@@ -27,3 +27,15 @@ def rtc_raster_pair():
 def golden_water_map():
     return '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
            'asf-tools/water-map/ki-threshold-initial-water-map.tif'
+
+
+@pytest.fixture(scope='session')
+def golden_hand():
+    return '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
+           'asf-tools/hand/hybas_af_lev12_v1c_firstpoly.tif'
+
+
+@pytest.fixture(scope='session')
+def hand_basin():
+    return '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
+           'asf-tools/hand/hybas_af_lev12_v1c_firstpoly.geojson'
