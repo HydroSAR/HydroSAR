@@ -33,18 +33,10 @@ def thresholds():
 
 
 @pytest.fixture(scope='session')
-def rtc_raster_pair():
-    primary = '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
-              'asf-tools/water-map/ki-threshold-pototype-scene.tif'
-    secondary = '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
-                'asf-tools/water-map/ki-threshold-pototype-scene.tif'
-    return primary, secondary
-
-
-@pytest.fixture(scope='session')
-def golden_water_map():
-    return '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
-           'asf-tools/water-map/ki-threshold-initial-water-map.tif'
+def hand_candidates():
+    hand_file = Path(__file__).parent / 'data' / 'hand_candidates.npz'
+    hand_data = np.load(hand_file)
+    return hand_data['hand_candidates']
 
 
 @pytest.fixture(scope='session')
