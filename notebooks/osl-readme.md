@@ -57,7 +57,7 @@ cd asf-tools
 conda env create -f prototype/osl-env.yml
 conda activate asf-tools
 
-# install the kernal so it'll be available in notebooks
+# install the kernel so it'll be available in notebooks
 python -m ipykernel install --user --name asf-tools
 kernda ${HOME}/.local/share/jupyter/kernels/asf-tools/kernel.json --env-dir ${CONDA_PREFIX} -o
 
@@ -67,6 +67,7 @@ python -m pip install -e .
 # test `asf_tools` is installed:
 python -c 'import asf_tools; print(asf_tools.__version__)'
 ```
+
 ### Finalize setup
 
 [Restart your server to make the `asf-tools` kernel available in notebooks](https://github.com/asfadmin/asf-jupyter-docs/blob/master/user_docs/guides/restarting_server_and_kernel.md)
@@ -77,6 +78,23 @@ Now you can:
 
 * Change the kernel of an existing notebook to the `asf-tools` kernel
   ![change_kernel](https://user-images.githubusercontent.com/7882693/116321985-9c426880-a767-11eb-91f1-a36d2b39a678.png)
+
+### Keeping in sync with changes upstream
+
+In the future, as dependencies are added/removed, you can update the conda environment with
+```bash
+conda env update -f prototype/osl-env.yml
+```
+but you should *not* need to reinstall the kernel or restart OpenSARlab for the
+environment updates to take effect.
+
+As `asf_tools` itself is developed, you may need to reinstall the editable version
+if the package structure has significantly changed, or entrypoints have been added/removed.
+```bash
+python -m pip install -e .
+```
+
+In general, any time you pull changes it's a good idea to run both of the above commands.
 
 ## Run the example `water-extent-map.ipynb`
 
