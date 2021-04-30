@@ -11,9 +11,8 @@ dependencies:
   - gdal>=3.2.0
   - numpy
   - pysheds
-  - shapely
   - rasterio
-  # For prototyping
-  - hyp3_sdk>=1.1
-  - jupyter
-  - kernda
+  - scikit-fuzzy
+  - scikit-image
+  - shapely
+
