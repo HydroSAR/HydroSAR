@@ -25,8 +25,9 @@ dependencies:
   - numpy
   - pysheds
   - rasterio
-  - shapely
   - scikit-fuzzy
+  - scikit-image
+  - shapely
   - pip:
     # for packaging and testing
     - s3pypi
