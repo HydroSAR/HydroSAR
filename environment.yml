@@ -24,8 +24,10 @@ dependencies:
   - gdal>=3.2.0
   - numpy
   - pysheds
-  - shapely
   - rasterio
+  - scikit-fuzzy
+  - scikit-image
+  - shapely
   - pip:
     # for packaging and testing
     - s3pypi
