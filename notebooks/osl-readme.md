@@ -1,17 +1,17 @@
 # Creating an `asf_tools` prototype environment in OpenSARlab
 
-<https://opensarlab.asf.alaska.edu/user/>
+<https://opensarlab.asf.alaska.edu/>
 
 ## Initial (one-time) setup
 
 Once you're logged into OpenSARlab, you'll need to do a little bit of setup to make
 OpenSARlab ready for development.
 
-*Note: The steaps only need to be done **once** and many of these steps will be
+*Note: The steps only need to be done **once** and many of these steps will be
 incorporated into the next OpenSARlab deployment.*
 
 
-###  Setup conda on OpenSARlab
+###  Set up conda on OpenSARlab
 
 First, open a new terminal:
 
