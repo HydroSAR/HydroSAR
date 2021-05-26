@@ -37,8 +37,3 @@ def hand_candidates():
     hand_file = Path(__file__).parent / 'data' / 'hand_candidates.npz'
     hand_data = np.load(hand_file)
     return hand_data['hand_candidates']
-
-
-@pytest.fixture(scope='session')
-def hand_basin():
-    return
