@@ -37,15 +37,3 @@ def hand_candidates():
     hand_file = Path(__file__).parent / 'data' / 'hand_candidates.npz'
     hand_data = np.load(hand_file)
     return hand_data['hand_candidates']
-
-
-@pytest.fixture(scope='session')
-def golden_hand():
-    return '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
-           'asf-tools/hand/hybas_af_lev12_v1c_firstpoly.tif'
-
-
-@pytest.fixture(scope='session')
-def hand_basin():
-    return '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/' \
-           'asf-tools/hand/hybas_af_lev12_v1c_firstpoly.geojson'
