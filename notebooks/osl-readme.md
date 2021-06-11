@@ -11,43 +11,6 @@ OpenSARlab ready for development.
 incorporated into the next OpenSARlab deployment.*
 
 
-###  Set up conda on OpenSARlab
-
-First, open a new terminal:
-
-![new_terminal](https://user-images.githubusercontent.com/7882693/108315967-ab55da80-7168-11eb-9fab-d66e01b52611.png)
-
-Then, setup conda on OpenSARlab by creating a `${HOME}/.condarc` file with these contents:
-
-```
-channels:
-  - conda-forge
-  - defaults
-
-channel_priority: strict
-
-create_default_packages:
-  - jupyter
-  - kernda
-
-envs_dirs:
-  - /home/jovyan/.local/envs
-  - /opt/conda/envs
-```
-
-and create a `${HOME}/.bash_profile` with these contents:
-```
-if [ -s ${HOME}/.bashrc ]; then
-    source ${HOME}/.bashrc;
-fi
-```
-
-and initialize conda in your shell
-```bash
-conda init
-source ${HOME}/.bashrc
-```
-
 ### Get `asf_tools` and setup a development environment
 
 ```bash
