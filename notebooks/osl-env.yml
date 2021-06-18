@@ -6,6 +6,7 @@ dependencies:
   - python>=3.8
   - pip
   # For running
+  - asf_search>=0.4
   - astropy
   - fiona
   - gdal>=3.2.0

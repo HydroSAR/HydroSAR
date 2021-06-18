@@ -2,53 +2,11 @@
 
 <https://opensarlab.asf.alaska.edu/>
 
-## Initial (one-time) setup
+**NOTE:** OpenSARlab was [upgraded on June 10, 2021](https://github.com/ASFOpenSARlab/opensarlab-docs/blob/master/OpenSARlab_release_notes/OpenSARlab_Release_Notes_June_2021.ipynb)
+with much better support for conda environments. This significantly simplifies setting
+up development environments and these instructions have changed accordingly.
 
-Once you're logged into OpenSARlab, you'll need to do a little bit of setup to make
-OpenSARlab ready for development.
-
-*Note: The steps only need to be done **once** and many of these steps will be
-incorporated into the next OpenSARlab deployment.*
-
-
-###  Set up conda on OpenSARlab
-
-First, open a new terminal:
-
-![new_terminal](https://user-images.githubusercontent.com/7882693/108315967-ab55da80-7168-11eb-9fab-d66e01b52611.png)
-
-Then, setup conda on OpenSARlab by creating a `${HOME}/.condarc` file with these contents:
-
-```
-channels:
-  - conda-forge
-  - defaults
-
-channel_priority: strict
-
-create_default_packages:
-  - jupyter
-  - kernda
-
-envs_dirs:
-  - /home/jovyan/.local/envs
-  - /opt/conda/envs
-```
-
-and create a `${HOME}/.bash_profile` with these contents:
-```
-if [ -s ${HOME}/.bashrc ]; then
-    source ${HOME}/.bashrc;
-fi
-```
-
-and initialize conda in your shell
-```bash
-conda init
-source ${HOME}/.bashrc
-```
-
-### Get `asf_tools` and setup a development environment
+## Initial (one-time) setup of an `asf_tools` development environment
 
 ```bash
 git clone https://github.com/ASFHyP3/asf-tools.git
@@ -57,10 +15,6 @@ cd asf-tools
 conda env create -f prototype/osl-env.yml
 conda activate asf-tools
 
-# install the kernel so it'll be available in notebooks
-python -m ipykernel install --user --name asf-tools
-kernda ${HOME}/.local/share/jupyter/kernels/asf-tools/kernel.json --env-dir ${CONDA_PREFIX} -o
-
 # install an editable/develop version of the `asf_tools` python package
 python -m pip install -e .
 
@@ -68,25 +22,26 @@ python -m pip install -e .
 python -c 'import asf_tools; print(asf_tools.__version__)'
 ```
 
-### Finalize setup
-
-[Restart your server to make the `asf-tools` kernel available in notebooks](https://github.com/asfadmin/asf-jupyter-docs/blob/master/user_docs/guides/restarting_server_and_kernel.md)
+Refresh your browser and the new environment should be available!
 
 Now you can:
 * Create a new notebook using the `asf-tools` kernel
-  ![new_notebook_kernel](https://user-images.githubusercontent.com/7882693/116321835-538aaf80-a767-11eb-8d09-26b06ca96202.png)
+  
+  ![new_notebook_kernel](https://user-images.githubusercontent.com/7882693/121728495-ce9af180-ca99-11eb-84eb-8114b7ce1183.png)
 
 * Change the kernel of an existing notebook to the `asf-tools` kernel
-  ![change_kernel](https://user-images.githubusercontent.com/7882693/116321985-9c426880-a767-11eb-91f1-a36d2b39a678.png)
+  
+  ![change_kernel](https://user-images.githubusercontent.com/7882693/121728676-0efa6f80-ca9a-11eb-959d-656c9376a8d7.png)
 
 ### Keeping in sync with changes upstream
 
-In the future, as dependencies are added/removed, you can update the conda environment with
+*Note:* These instructions assume you're working from the head/root of the asf-tools repository.
+
+In the future, as dependencies are added or removed, you can update the conda environment with
 ```bash
 conda env update -f prototype/osl-env.yml
 ```
-but you should *not* need to reinstall the kernel or restart OpenSARlab for the
-environment updates to take effect.
+and you should *not* need to restart OpenSARlab for the environment updates to take effect.
 
 As `asf_tools` itself is developed, you may need to reinstall the editable version
 if the package structure has significantly changed, or entrypoints have been added/removed.
@@ -98,10 +53,14 @@ In general, any time you pull changes it's a good idea to run both of the above 
 
 ## Run the example `water-extent-map.ipynb`
 
-Once you've completed the above one-time setup and restarted your OSL server, you
-can run through the example `water-extent-map.ipynb` notebook, which will be located
-at `${home}/asf-tools/prototype/`
+Once you've completed the above one-time setup, you can run through the example notebook,
+which will be located in the `prototype/` directory:
+* `water-extent-map.ipynb` -- Run the water map code directly. This allows you to
+  edit the code and see the changes reflected.
+* `water-extent-map-on-demand.ipynb` -- Request water map products from the custom HyP3-watermap deployment
+   using either ASF Search Vertex or the `asf_search` Python package, and the HyP3 SDK.
 
-![water-extent-map.ipynb](https://user-images.githubusercontent.com/7882693/116322104-d3b11500-a767-11eb-81cd-f7083ca0f42c.png)
+  ![prototype notebooks](https://user-images.githubusercontent.com/7882693/122486645-f7cded00-cf85-11eb-8c94-2ddd63961059.png)
 
-*Note: Make sure you change this notebook's kernel to the `asf-tools` kernel!*
+
+*Note: Make sure you change the notebook kernel for each of these notebooks to the `asf-tools` kernel!*
