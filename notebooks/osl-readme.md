@@ -57,12 +57,10 @@ Once you've completed the above one-time setup, you can run through the example 
 which will be located in the `prototype/` directory:
 * `water-extent-map.ipynb` -- Run the water map code directly. This allows you to
   edit the code and see the changes reflected.
-* `water-extent-map-sdk.ipynb` -- Request water map products from HyP3 using the
-  `asf_search` python package and the HyP3 SDK.
-* `water-extent-map-vertex.ipynb` -- Request water map products from HyP3 using
-  ASF Search Vertex and the HyP3 SDK.
+* `water-extent-map-on-demand.ipynb` -- Request water map products from the custom HyP3-watermap deployment
+   using either ASF Search Vertex or the `asf_search` Python package, and the HyP3 SDK.
 
-  !![prototype notebooks](https://user-images.githubusercontent.com/7882693/121728834-3fdaa480-ca9a-11eb-8d7b-8759004e74f9.png)
+  ![prototype notebooks](https://user-images.githubusercontent.com/7882693/122486645-f7cded00-cf85-11eb-8c94-2ddd63961059.png)
 
 
 *Note: Make sure you change the notebook kernel for each of these notebooks to the `asf-tools` kernel!*
