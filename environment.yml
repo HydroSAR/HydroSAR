@@ -21,7 +21,7 @@ dependencies:
   # For running
   - astropy
   - fiona
-  - gdal>=3.2.0
+  - gdal>=3.3
   - numpy
   - pysheds
   - rasterio
@@ -31,3 +31,4 @@ dependencies:
   - pip:
     # for packaging and testing
     - s3pypi
+    - gdal-utils
