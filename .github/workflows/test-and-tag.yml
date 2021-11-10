@@ -50,7 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
         with:
-          query: .github/queries/asssociated-pr.query.yml
+          query: .github/queries/associated-pr.query.yml
           outputFile: pr.json
           owner: ASFHyP3
           name: asf-tools

@@ -26,7 +26,7 @@ jobs:
           args: zip -qq -j -r ${{ steps.release_assets.outputs.ARC_FILE }} ArcGIS-toolbox
 
       - name: Create Release
-        uses: docker://antonyurchenko/git-release:latest
+        uses: docker://antonyurchenko/git-release:v3.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
           ALLOW_TAG_PREFIX: "true"
