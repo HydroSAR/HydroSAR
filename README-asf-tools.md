@@ -3,6 +3,8 @@ ASF Tools
 **_A collection of tools for working with higher-level SAR products_**
 -----
 
+[![DOI](https://zenodo.org/badge/295506894.svg)](https://zenodo.org/badge/latestdoi/295506894)
+
 ## ArcGIS Toolbox
 The [ArcGIS Python Toolbox](ArcGIS-toolbox) can be used with either ArcGIS Desktop or 
 ArcGIS Pro, and contains tools that perform geoprocessing tasks useful for working

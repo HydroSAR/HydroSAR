@@ -1,0 +1,21 @@
+name: asf-tools
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.8
+  - pip
+  # For running
+  - asf_search>=0.4
+  - astropy
+  - fiona
+  - gdal>=3.2.0
+  - hyp3_sdk>=1.1
+  - jupyter
+  - kernda
+  - numpy
+  - pysheds
+  - rasterio
+  - scikit-fuzzy
+  - scikit-image
+  - shapely
