@@ -38,5 +38,5 @@ RUN mamba env create -f /asf-tools/environment.yml && \
     sed -i 's/conda activate base/conda activate asf-tools/g' /home/conda/.profile && \
     python -m pip install --no-cache-dir /asf-tools
 
-ENTRYPOINT ["/hyp3-autorift/hyp3_autorift/etc/entrypoint.sh"]
-CMD ["-h"]
+ENTRYPOINT ["/usr/bin/bash"]
+CMD ["-l"]
