@@ -1,0 +1,31 @@
+name: Test and build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  call-pytest-workflow:
+    uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@main
+    with:
+      local_package_name: asf_tools
+      conda_env_name: asf-tools
+
+  call-version-info-workflow:
+    uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@main
+    with:
+      conda_env_name: asf-tools
+
+  call-docker-ghcr-workflow:
+    needs: call-version-info-workflow
+    uses: ASFHyP3/actions/.github/workflows/reusable-docker-ghcr.yml@main
+    with:
+      version_tag: ${{ needs.call-version-info-workflow.outputs.version_tag }}
+    secrets:
+      USER_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
