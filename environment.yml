@@ -22,7 +22,7 @@ dependencies:
   - astropy
   - fiona
   - gdal>=3.3
-  - numpy==1.21.4
+  - numpy=1.21.4
   - pysheds
   - rasterio
   - scikit-fuzzy
@@ -32,3 +32,5 @@ dependencies:
     # for packaging and testing
     - s3pypi
     - gdal-utils
+    - gdal-utils
+
