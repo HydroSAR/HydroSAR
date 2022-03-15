@@ -22,7 +22,7 @@ dependencies:
   - astropy
   - fiona
   - gdal>=3.3
-  - numpy=1.21.4
+  - numpy
   - pysheds
   - rasterio
   - scikit-fuzzy
