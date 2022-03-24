@@ -28,7 +28,6 @@ dependencies:
   - scikit-fuzzy
   - scikit-image
   - shapely
-  - tqdm
   - pip:
     # for packaging and testing
     - s3pypi
