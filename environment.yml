@@ -23,12 +23,11 @@ dependencies:
   - fiona
   - gdal>=3.3
   - numpy
-  - pysheds
+  - pysheds>=0.3
   - rasterio
   - scikit-fuzzy
   - scikit-image
   - shapely
   - pip:
-    # for packaging and testing
-    - s3pypi
+    # for testing
     - gdal-utils
