@@ -37,3 +37,17 @@ def hand_candidates():
     hand_file = Path(__file__).parent / 'data' / 'hand_candidates.npz'
     hand_data = np.load(hand_file)
     return hand_data['hand_candidates']
+
+
+@pytest.fixture(scope='session')
+def hand_window():
+    hand_file = Path(__file__).parent / 'data' / 'hand_window.npz'
+    hand_data = np.load(hand_file)
+    return hand_data['hand_window']
+
+
+@pytest.fixture(scope='session')
+def flood_window():
+    flood_file = Path(__file__).parent / 'data' / 'flood_window.npz'
+    flood_data = np.load(flood_file)
+    return flood_data['flood_window']

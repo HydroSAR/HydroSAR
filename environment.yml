@@ -27,6 +27,7 @@ dependencies:
   - rasterio
   - scikit-fuzzy
   - scikit-image
+  - scipy
   - shapely
   - pip:
     # for testing
