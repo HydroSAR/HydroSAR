@@ -1,0 +1,13 @@
+name: hydrosar
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.8
+  - pip
+  - asf_search
+  - asf_tools
+  - boto3
+  - hyp3_sdk
+  - jupyter
+  - jupyterlab
