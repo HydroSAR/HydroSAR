@@ -1,3 +1,5 @@
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fjmeyer/HydroSAR/binder_flood_depth_est?filepath=Flood_Depth_Estimation_with_Flood_Extent_Maps_v0_1_12.ipynb)
+
 # HydroSAR
 ## About the HydroSAR Project
 HydroSAR is a project funded by the NASA Applied Sciences Program focused on the development of algorithms for the monitoring of hydrological hazards using data from Synthetic Aperture Radar (SAR) sensors. Algorithms are being developed for the following SAR-derived products:
