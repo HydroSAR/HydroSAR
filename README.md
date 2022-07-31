@@ -18,9 +18,8 @@ Using the Hybrid Plugin Processing Pipeline (HyP3, pronounced *'hype'*)
 
 ### Earth Data Cloud Account
 
-Before working with these notebooks, it is required that users [create an Earth Data Cloud (EDC) account](https://urs.earthdata.nasa.gov/users/new?client_id=BO_n7nTIlMljdvU6kRRB3g&redirect_uri=https%3A%2F%2Fauth.asf.alaska.edu%2Flogin&response_type=code&state=https%3A%2F%2Fsearch.asf.alaska.edu) to submit SAR products for processing with HyP3 via the [search tool](https://search.asf.alaska.edu/),
+Before working with these notebooks, users must have [an Earth Data Cloud (EDC) account](https://urs.earthdata.nasa.gov/users/new?client_id=BO_n7nTIlMljdvU6kRRB3g&redirect_uri=https%3A%2F%2Fauth.asf.alaska.edu%2Flogin&response_type=code&state=https%3A%2F%2Fsearch.asf.alaska.edu) to submit SAR products for processing with HyP3 via the [search tool](https://search.asf.alaska.edu/),
 [HyP3 SDK](https://hyp3-docs.asf.alaska.edu/using/sdk/), or [HyP3 API](https://hyp3-api.asf.alaska.edu/ui/).
-
 
 
 ## About the HydroSAR Project
