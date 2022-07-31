@@ -1,4 +1,28 @@
-# HydroSAR
+# HydroSAR Transition Workshop Notebooks
+
+This is a collection of Notebooks to facilitate the HydroSAR Data Products and Web Application training.
+Through the notebooks, users will understand the Alaska Satellite Facility's (ASF) workflow
+monitoring for, archiving, and processing SAR products.
+Detailing this process will allow for a successful [transition](https://docs.google.com/document/d/1yq3AM1UP-FGp8eRTDvFgA9w3adKmMqkMAZrhrF2ehVc/edit#heading=h.w8471kkg8kit)
+of ownership from ASF/HydroSAR to the SERVIR-HKH science team.
+By the end of [the 2022 ICIMOD Transition workshop](https://docs.google.com/document/d/12HNAOdG76Fm6zdVjEcreF17cLBMDN_N5l0vF_-lUAr4/edit), ICIMOD participants will have sufficient understanding of the various ways how the HydroSAR service can be run and maintained.
+
+![HydroSAR Banner](https://docs.google.com/drawings/d/e/2PACX-1vS8Pg7F6qXVRez6rAbUI97eetkBHUjPUatLRfj0AtUemKVYf9XxyZ2twV3HMBbvk_vjCI7l0GU4RcSc/pub?w=905&h=432)
+## Overview of Workflow
+
+1. Search ASF for granules
+
+Using the Hybrid Plugin Processing Pipeline (HyP3, pronounced *'hype'*)
+2. Get RTC products and produce surface water extent and flood depth maps
+3. Archive in S3 Bucket
+
+### Earth Data Cloud Account
+
+Before working with these notebooks, it is required that users [create an Earth Data Cloud (EDC) account](https://urs.earthdata.nasa.gov/users/new?client_id=BO_n7nTIlMljdvU6kRRB3g&redirect_uri=https%3A%2F%2Fauth.asf.alaska.edu%2Flogin&response_type=code&state=https%3A%2F%2Fsearch.asf.alaska.edu) to submit SAR products for processing with HyP3 via the [search tool](https://search.asf.alaska.edu/),
+[HyP3 SDK](https://hyp3-docs.asf.alaska.edu/using/sdk/), or [HyP3 API](https://hyp3-api.asf.alaska.edu/ui/).
+
+
+
 ## About the HydroSAR Project
 HydroSAR is a project funded by the NASA Applied Sciences Program focused on the development of algorithms for the monitoring of hydrological hazards using data from Synthetic Aperture Radar (SAR) sensors. Algorithms are being developed for the following SAR-derived products:
 - **RTC30:** Time series of Radiometrically Terrain Corrected (RTC) SAR images provided at 30 m resolution.
