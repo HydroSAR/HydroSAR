@@ -17,7 +17,8 @@ For more information, please see:
 The HydroSAR service consists of 4 major components, which are detailed in their associated notebooks:
 1. Monitoring an Area of Interest (AOI) for new Sentinel-1 acquisitions: [HydroSAR_service_monitoring.ipynb](./HydroSAR_service_monitoring.ipynb)
 2. Processing new Sentinel-1 Level-1 SLC products into HydroSAR products [HydroSAR_service_creating_water_products.ipynb](./HydroSAR_service_creating_water_products.ipynb)
-3. Archiving new HydroSAR products: [HydroSAR_service_archiving.ipynb](./HydroSAR_service_archiving.ipynb)
+3. Archiving new HydroSAR products in AWS S3: [HydroSAR_service_archiving.ipynb](./HydroSAR_service_archiving.ipynb)
+   * As an alternative, we also include [HydroSAR_service_archiving_local.ipynb](./HydroSAR_service_archiving_local.ipynb) if you're archiving the products outside of AWS.
 4. Updating ESRI Image Services with any newly archived products
 
 ### Earth Data Cloud Account
