@@ -4,5 +4,5 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-      labels:
-        - "bumpless"
+    labels:
+      - "bumpless"
