@@ -36,7 +36,7 @@ jobs:
             ${{ steps.release_assets.outputs.ARC_FILE }}
 
       - name: Bump ASF Tools version in HyP3 docs
-        uses: benc-uk/workflow-dispatch@v1.1
+        uses: benc-uk/workflow-dispatch@v1.2
         with:
           workflow: Update ASF Tools version
           token: ${{ secrets.TOOLS_BOT_PAK }}
