@@ -1,6 +1,9 @@
 include LICENSE
-include asf_tools/README.md
+include src/asf_tools/README.md
 
-graft asf_tools
+graft src/asf_tools
 
 global-exclude *.py[cod] __pycache__ *.so
+
+prune ArcGIS-toolbox
+prune prototype
