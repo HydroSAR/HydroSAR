@@ -1,8 +1,3 @@
-include LICENSE
-include src/asf_tools/README.md
-
-graft src/asf_tools
-
 global-exclude *.py[cod] __pycache__ *.so
 
 prune ArcGIS-toolbox
