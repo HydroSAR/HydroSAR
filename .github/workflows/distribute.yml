@@ -47,6 +47,6 @@ jobs:
 
       - uses: mamba-org/provision-with-micromamba@v14
 
-      - name: Ensure edlfs v${{ needs.call-version-info-workflow.outputs.version }}} is pip installable
+      - name: Ensure asf_tools v${{ needs.call-version-info-workflow.outputs.version }}} is pip installable
         run: |
-          python -m pip install edlfs==${{ needs.call-version-info-workflow.outputs.version_tag }}
+          python -m pip install asf_tools==${{ needs.call-version-info-workflow.outputs.version_tag }}
