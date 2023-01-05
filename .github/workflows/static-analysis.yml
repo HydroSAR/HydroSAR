@@ -10,7 +10,7 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -20,31 +20,8 @@ jobs:
       - name: Lint with flake8
         run: |
           flake8 --max-line-length=120 --import-order-style=pycharm --statistics \
-              --application-import-names asf_tools ArcGIS-toolbox/ASF_Tools.pyt asf_tools
+              --application-import-names asf_tools ArcGIS-toolbox/ASF_Tools.pyt src/asf_tools
 
 
   call-secrets-analysis-workflow:
-    uses: ASFHyP3/actions/.github/workflows/reusable-secrets-analysis.yml@v0.4.0
-
-
-  trufflehog:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-
-      - name: Install dependencies
-        run: |
-          python -m pip install trufflehog gitdb2=='2.*'
-
-      - name: Scan for secrets with trufflehog
-        run: |
-          git fetch origin +refs/tags/*:refs/tags/*
-          export LAST_TAG_HASH=$(git show-ref --hash -- $(git describe --abbrev=0))
-          trufflehog --regex --entropy True --since_commit '${LAST_TAG_HASH}' \
-              --exclude_paths .trufflehog.txt file://'${PWD}'
+    uses: ASFHyP3/actions/.github/workflows/reusable-secrets-analysis.yml@v0.6.0
