@@ -1,2 +1,68 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asf_tools"
+requires-python = ">=3.8"
+authors = [
+    {name="ASF APD/Tools Team", email="uaf-asf-apd@alaska.edu"},
+]
+description = "Tools developed by ASF for working with SAR data"
+readme = "src/asf_tools/README.md"
+license = {text = "BSD-3-Clause"}
+classifiers=[
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "astropy",
+    "fiona",
+    "gdal>=3.3",
+    "numpy",
+    "pysheds>=0.3",
+    "rasterio",
+    "scikit-fuzzy",
+    "scikit-image",
+    "scipy",
+    "shapely",
+    "tqdm",
+]
+dynamic = ["version"]
+
+[project.scripts]
+make_composite = "asf_tools.composite:main"
+water_map = "asf_tools.water_map:main"
+calculate_hand = "asf_tools.hand.calculate:main"
+flood_map = "asf_tools.flood_map:main"
+
+[project.optional-dependencies]
+develop = [
+    "flake8",
+    "flake8-import-order",
+    "flake8-blind-except",
+    "flake8-builtins",
+    "gdal-utils",
+    "pytest",
+    "pytest-cov",
+    "pytest-console-scripts",
+]
+
+[project.urls]
+Homepage = "https://github.com/ASFHyP3/asf-tools"
+"Bug Tracker" = "https://github.com/ASFHyP3/asf-tools/issues"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]

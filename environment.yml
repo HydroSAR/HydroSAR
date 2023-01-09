@@ -8,13 +8,13 @@ dependencies:
   - pip
   # For packaging, and testing
   # - arcpy  # windows only
+  - build
   - flake8
   - flake8-import-order
   - flake8-blind-except
   - flake8-builtins
-  - setuptools
-  - setuptools_scm
-  - wheel
+  - setuptools>=61
+  - setuptools_scm>=6.2
   - pytest
   - pytest-console-scripts
   - pytest-cov
@@ -22,7 +22,7 @@ dependencies:
   - astropy
   - fiona
   - gdal>=3.3
-  - numpy
+  - numpy<1.24.0
   - pysheds>=0.3
   - rasterio
   - scikit-fuzzy
