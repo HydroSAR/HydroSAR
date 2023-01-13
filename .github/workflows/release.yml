@@ -39,6 +39,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1.2
         with:
           workflow: update_asf_tools_version.yml
+          token: ${{ secrets.TOOLS_BOT_PAK }}
           repo: ASFHyP3/hyp3-docs
           ref: main
           inputs: '{"asf_tools_version": "${{ steps.release_assets.outputs.version_tag }}"}'
