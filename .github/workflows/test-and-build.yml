@@ -15,12 +15,9 @@ jobs:
     uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@v0.7.0
     with:
       local_package_name: asf_tools
-      conda_env_name: asf-tools
 
   call-version-info-workflow:
     uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.7.0
-    with:
-      conda_env_name: asf-tools
 
   call-docker-ghcr-workflow:
     needs: call-version-info-workflow
