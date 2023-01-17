@@ -20,6 +20,7 @@ dependencies:
   - pytest-cov
   # For running
   - astropy
+  - boto3
   - fiona
   - gdal>=3.3
   - numpy
