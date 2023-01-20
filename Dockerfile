@@ -38,5 +38,8 @@ RUN mamba env create -f /asf-tools/environment.yml && \
     sed -i 's/conda activate base/conda activate asf-tools/g' /home/conda/.profile && \
     python -m pip install --no-cache-dir /asf-tools
 
+# attempt to speed up initial asf_tools imports by caching *something*...
+RUN python -m asf_tools --help
+
 ENTRYPOINT ["/asf-tools/src/asf_tools/etc/entrypoint.sh"]
 CMD ["-h"]
