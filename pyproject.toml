@@ -42,6 +42,10 @@ water_map = "asf_tools.water_map:main"
 calculate_hand = "asf_tools.hand.calculate:main"
 flood_map = "asf_tools.flood_map:main"
 
+[project.entry-points.hyp3]
+water_map = "asf_tools.water_map:hyp3"
+flood_map = "asf_tools.flood_map:hyp3"
+
 [project.optional-dependencies]
 develop = [
     "flake8",
