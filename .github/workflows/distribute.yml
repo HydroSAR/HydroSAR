@@ -19,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: mamba-org/provision-with-micromamba@v14
+      - uses: mamba-org/provision-with-micromamba@v15
 
       - name: Build distribution
         id: build
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: mamba-org/provision-with-micromamba@v14
+      - uses: mamba-org/provision-with-micromamba@v15
 
       - name: Ensure asf_tools v${{ needs.call-version-info-workflow.outputs.version }}} is pip installable
         run: |
