@@ -1,0 +1,38 @@
+name: fier
+channels:
+  - conda-forge
+dependencies:
+  - asf_search
+  - eofs
+  - gdal  
+  - geoglows
+  - hyp3_sdk
+  - ipyfilechooser
+  - ipympl
+  - jupyterlab
+  - ipywidgets<8.0.0
+  - kernda
+  - matplotlib<3.7.0
+  - netcdf4
+  - numpy
+  - opensarlab_lib
+  - pandas
+  - pip
+  - plotly
+  - qt
+  - pycrs
+  - pyproj
+  - python=3.8
+  - rasterio
+  - rioxarray
+  - s3fs
+  - scikit-learn
+  - scipy
+  - shapely
+  - traitlets==5.1.1
+  - xarray
+  - zarr
+  - pip:
+    - mpldatacursor
+    - url-widget
+    - git+https://github.com/servir/fierpy.git 
