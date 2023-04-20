@@ -21,8 +21,8 @@ from skimage import measure
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
 from asf_tools.composite import get_epsg_code, write_cog
 from asf_tools.hydrosar.hand.prepare import prepare_hand_for_raster
+from asf_tools.hydrosar.threshold import expectation_maximization_threshold as em_threshold
 from asf_tools.raster import read_as_masked_array
-from asf_tools.threshold import expectation_maximization_threshold as em_threshold
 from asf_tools.tile import tile_array, untile_array
 
 log = logging.getLogger(__name__)
