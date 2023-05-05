@@ -4,6 +4,12 @@ import numpy as np
 import pytest
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "integration: marks tests as integration"
+    )
+
+
 def pytest_addoption(parser):
     parser.addoption('--integration', action='store_true', default=False, dest='integration',
                      help='enable integration tests')
