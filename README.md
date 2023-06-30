@@ -16,3 +16,6 @@ HydroSAR includes an interdisciplinary team from the following universities and 
 - University of Alabama, Huntsville (UAH); Huntsville, AL
 - NASA Goddard Space Flight Center (GSFC); Greenbelt, MD
 - Jet Propulsion Laboratory (JPL); Pasadena, CA
+
+## How to run the Forecast Workflow
+<img src="HydroSAR Workflow.jpg" align="right" width="1500" />
