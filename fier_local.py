@@ -342,8 +342,8 @@ def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 
 
     # # waiting for release of sklean version >= 0.24
     # # until then have a placeholder function to do the rotation
-    # fa = FactorAnalysis(n_components=n_modes, rotation="varimax")
-    # rotated[non_masked_idx,:] = fa.fit_transform(eof_components[non_masked_idx,:])
+    #fa = FactorAnalysis(n_components=n_modes, rotation="varimax")
+    #rotated[non_masked_idx,:] = fa.fit_transform(eof_components[non_masked_idx,:])
 
     # apply varimax rotation to eof components
     # placeholder function until sklearn version >= 0.24
