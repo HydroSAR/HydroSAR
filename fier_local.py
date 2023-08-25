@@ -14,6 +14,7 @@ from eofs.xarray import Eof
 from geoglows import streamflow
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import FactorAnalysis
 from typing import Tuple
 
 logging.basicConfig(level=logging.INFO)
@@ -86,7 +87,7 @@ def unrot_eof(stack: xr.DataArray, variance_threshold: float = 0.8, n_modes: int
     # structure the spatial and temporal eof components in a Dataset
     eof_ds = xr.Dataset(
         {
-            "spatial_modes": (["lat","lon","mode"],spatial),
+            "spatial_modes": (["lat","lon","mode"],spatial[:,:,-1]),
             "temporal_modes":(["time","mode"],projected_pcs),
             "center": (["lat","lon"],center.values.reshape(spatial_shape))
         },
@@ -286,7 +287,7 @@ def wrap_streamflow(lats: list, lons: list) -> Tuple[xr.DataArray, list]:
     return q, reaches      
 
 
-def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 4) -> xr.Dataset:
+def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 100) -> xr.Dataset:
     """Function to perform rotated empirical othogonal function (eof) on a spatial timeseries
 
     args:
@@ -300,6 +301,7 @@ def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 
             as variables
 
     """
+
     # extract out some dimension shape information
     shape3d = stack.shape
     spatial_shape = shape3d[1:]
@@ -327,37 +329,52 @@ def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 
     # if not get n_modes based on variance explained
     if n_modes < 0:
         n_modes = int((solver.varianceFraction().cumsum() < variance_threshold).sum())
-
-    # calculate to spatial eof values
-    eof_components = solver.eofs(neofs=n_modes).transpose()
     
-    # get total variance fractions of eof (up to the max. retained mode)
+    # get total and cumulated total variance fractions of eof (up to the max. retained mode)
     total_eof_var_frac = solver.varianceFraction(neigs=n_modes).cumsum()
     
+    # Determine how many modes we need to represent 90% of the dataset's variance
+    ind_90 = np.where(np.abs(total_eof_var_frac-0.9) == np.min(np.abs(total_eof_var_frac-0.9)))[0][0]
+    
+    # Plot the amount of variance depending on each mode
+    plt.figure()
+    plt.plot(total_eof_var_frac*100)
+    plt.xlabel('amount of modes')
+    plt.ylabel('dataset variance explained by the modes [%]')
+    plt.axhline(y = 90, color = 'r', linestyle = '-')
+    plt.axvline(x = ind_90, color = 'red')
+    plt.title(f"90% of the variance is explained by the first {ind_90} modes") 
+
+    # Set the amount of modes to that 90% cutoff
+    n_modes = ind_90
+    
+    # Crop the total eof variance fraction
+    total_eof_var_frac = total_eof_var_frac[:n_modes] 
+
+    # calculate to spatial eof values
+    eof_components = solver.eofs(neofs=100).transpose()
+
     # get the indices where the eof is valid data
     non_masked_idx = np.where(np.logical_not(np.isnan(eof_components[:,0])))[0]
 
     # create a "blank" array to set roated values to
-    rotated = eof_components.values.copy()
+    rotated = eof_components.copy()
 
     # # waiting for release of sklean version >= 0.24
     # # until then have a placeholder function to do the rotation
-    #fa = FactorAnalysis(n_components=n_modes, rotation="varimax")
-    #rotated[non_masked_idx,:] = fa.fit_transform(eof_components[non_masked_idx,:])
-
-    # apply varimax rotation to eof components
-    # placeholder function until sklearn version >= 0.24
-    rotated[non_masked_idx,:] = _ortho_rotation(eof_components[non_masked_idx,:])
+    fa = FactorAnalysis(n_components=100, rotation="varimax")
+    rotated[non_masked_idx,:] = fa.fit_transform(eof_components[non_masked_idx,:])
+    rotated = rotated.values[:,:n_modes] # We crop out the last mode that is usually filled with 0s
 
     # project the original time series data on the rotated eofs
     projected_pcs = np.dot(centered[:,non_masked_idx], rotated[non_masked_idx,:])
     
-    print(projected_pcs.shape)
-    
     # get variance of each rotated mode
     rot_var = np.var(projected_pcs, axis=0)
+    
     # get variance of all rotated modes
     total_rot_var = rot_var.cumsum()
+    
     # get variance fraction of each rotated mode
     rot_var_frac = ((rot_var/total_rot_var)*total_eof_var_frac)*100
     
@@ -371,7 +388,7 @@ def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 
     indx_rot_var_frac_sort = np.expand_dims(indx_rot_var_frac_sort, axis=0)
     spatial_rotated = np.take_along_axis(spatial_rotated,indx_rot_var_frac_sort,axis=2)
 
-    # structure the spatial and temporal reof components in a Dataset
+    # structure the spatial and temporal reof components in a Dataset. We squeeze out the last n_mode because it is empty
     reof_ds = xr.Dataset(
         {
             "spatial_modes": (["lat","lon","mode"],spatial_rotated),
@@ -382,9 +399,10 @@ def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 
             "lon":(["lon"],stack.lon.values),
             "lat":(["lat"],stack.lat.values),
             "time":stack.time.values,
-            "mode": np.arange(n_modes)+1
+            "mode": np.arange(n_modes)
         }
     )
+
 
     return reof_ds
 
