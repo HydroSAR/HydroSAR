@@ -17,6 +17,7 @@ HydroSAR includes an interdisciplinary team from the following universities and 
 - NASA Goddard Space Flight Center (GSFC); Greenbelt, MD
 - Jet Propulsion Laboratory (JPL); Pasadena, CA
 
+
 # FIERpy Pipeline Instructions:
 
 ## Order RTC jobs and launch your server
@@ -34,7 +35,7 @@ The pipeline was made to work directly with ASF’s Vertex RTC images.
 - Launch Notebook 4. If you activate the post-processing, it might take a few hours. If not, it might take up to 30min if you have around 90 RTC images.
 
 ## Compute the forecast
-**Only after you have downloaded (ERA5 precipitation data)[https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=overview] and computed HAND DEM with Water Masks**
+**Only after you have downloaded [ERA5 precipitation data](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=overview) and computed HAND DEM with Water Masks**
 - Launch Notebook 5. It can take a few hours to compute. Follow the instructions, make sure the indices you select for the forecast time-window are 12 days total. An error message should pop-up if it's not the case.
 *Remember: this forecast does not actually forecast past your present day. GEOGLOWS (discharge input) is generally stops 2 months before your current date, and 1 month for ERA5.*
 
