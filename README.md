@@ -43,4 +43,4 @@ The pipeline was made to work directly with ASF’s Vertex RTC images.
 
 
 ## Workflow
-<img src="HydroSAR Workflow.jpg" align="right" width="1500" />
+<img src="docs/HydroSAR Workflow.jpg" align="right" width="1500" />
