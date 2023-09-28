@@ -19,7 +19,7 @@ import urllib
 import subprocess
 import json
 
-import gdal  # for Open
+from osgeo import gdal  # for Open
 import numpy as np
 import pandas as pd
 
