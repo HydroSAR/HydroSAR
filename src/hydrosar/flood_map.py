@@ -62,16 +62,17 @@ def iterative(hand: np.array, extent: np.array, x0: float = 7.5, water_levels: n
     def get_confusion_matrix(w):
         iterative_flood_extent = hand < w  # w=water level
         tp = np.nansum(np.logical_and(iterative_flood_extent == 1, extent == 1))  # true positive
+        tn = np.nansum(np.logical_and(iterative_flood_extent == 0, extent == 0))  # true negative
         fp = np.nansum(np.logical_and(iterative_flood_extent == 1, extent == 0))  # False positive
         fn = np.nansum(np.logical_and(iterative_flood_extent == 0, extent == 1))  # False negative
-        return tp, fp, fn
+        return tp, tn, fp, fn
 
     def _goal_ts(w):
-        tp, fp, fn = get_confusion_matrix(w)
-        return 1 - tp / (tp + fp + fn)  # threat score #we will minimize goal func, hence 1-threat_score.
+        tp, _, fp, fn = get_confusion_matrix(w)
+        return 1 - tp / (tp + fp + fn)  # threat score -- we will minimize goal func, hence `1 - threat_score`.
 
     def _goal_fmi(w):
-        tp, fp, fn = get_confusion_matrix(w)
+        tp, _, fp, fn = get_confusion_matrix(w)
         return 1 - np.sqrt((tp/(tp+fp))*(tp/(tp+fn)))
 
     class MyBounds(object):
