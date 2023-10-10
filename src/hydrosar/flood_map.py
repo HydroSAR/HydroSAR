@@ -85,10 +85,14 @@ def iterative(hand: np.array, extent: np.array, x0: float = 7.5, water_levels: n
             tmax = bool(np.all(x <= self.xmax))
             tmin = bool(np.all(x >= self.xmin))
             return tmax and tmin
+
     bounds = MyBounds()
     MINIMIZATION_FUNCTION = {'fmi': _goal_fmi, 'ts': _goal_ts}
-    opt_res = optimize.basinhopping(MINIMIZATION_FUNCTION[minimization_metric], x0, niter=10000, niter_success=100,
-                                    accept_test=bounds, stepsize=3)
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        opt_res = optimize.basinhopping(MINIMIZATION_FUNCTION[minimization_metric], x0, niter=10000, niter_success=100,
+                                        accept_test=bounds, stepsize=3)
+
     if opt_res.message[0] == 'success condition satisfied' \
             or opt_res.message[0] == 'requested number of basinhopping iterations completed successfully':
         return opt_res.x[0]
