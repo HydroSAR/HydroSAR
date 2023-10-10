@@ -57,7 +57,7 @@ def get_waterbody(input_info: dict, threshold: Optional[float] = None) -> np.arr
     return water_array > threshold
 
 
-def iterative(hand: np.array, extent: np.array, x0: float = 7.5, water_levels: np.array = range(15),
+def iterative(hand: np.array, extent: np.array, water_levels: np.array = np.arange(15),
               minimization_metric: str = 'fmi'):
     def get_confusion_matrix(w):
         iterative_flood_extent = hand < w  # w=water level
@@ -90,7 +90,7 @@ def iterative(hand: np.array, extent: np.array, x0: float = 7.5, water_levels: n
     MINIMIZATION_FUNCTION = {'fmi': _goal_fmi, 'ts': _goal_ts}
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
-        opt_res = optimize.basinhopping(MINIMIZATION_FUNCTION[minimization_metric], x0, niter=10000, niter_success=100,
+        opt_res = optimize.basinhopping(MINIMIZATION_FUNCTION[minimization_metric], np.mean(water_levels), niter=10000, niter_success=100,
                                         accept_test=bounds, stepsize=3)
 
     if opt_res.message[0] == 'success condition satisfied' \
@@ -126,9 +126,9 @@ def estimate_flood_depth(label, hand, flood_labels, estimator='iterative', water
             hand_std = stats.median_abs_deviation(hand[flood_labels == label], scale='normal',
                                                   nan_policy='omit')
             if estimator.lower() == "iterative":
+                water_levels = np.arange(*iterative_bounds)
                 return iterative(hand, flood_labels == label,
-                                 x0=hand_mean + water_level_sigma * hand_std,
-                                 water_levels=iterative_bounds, minimization_metric=minimization_metric)
+                                 water_levels=water_levels, minimization_metric=minimization_metric)
         if estimator.lower() == "numpy":
             hand_mean = np.nanmean(hand[flood_labels == label])
             hand_std = np.nanstd(hand[flood_labels == label])
