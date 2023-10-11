@@ -121,14 +121,15 @@ def estimate_flood_depth(label, hand, flood_labels, estimator='iterative', water
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', r'Mean of empty slice')
 
-        if estimator.lower() == "iterative" or estimator.lower() == "nmad":
+        if estimator.lower() == "iterative":
+            water_levels = np.arange(*iterative_bounds)
+            return iterative(hand, flood_labels == label,
+                             water_levels=water_levels, minimization_metric=minimization_metric)
+
+        if estimator.lower() == "nmad":
             hand_mean = np.nanmean(hand[flood_labels == label])
-            hand_std = stats.median_abs_deviation(hand[flood_labels == label], scale='normal',
-                                                  nan_policy='omit')
-            if estimator.lower() == "iterative":
-                water_levels = np.arange(*iterative_bounds)
-                return iterative(hand, flood_labels == label,
-                                 water_levels=water_levels, minimization_metric=minimization_metric)
+            hand_std = stats.median_abs_deviation(hand[flood_labels == label], scale='normal', nan_policy='omit')
+
         if estimator.lower() == "numpy":
             hand_mean = np.nanmean(hand[flood_labels == label])
             hand_std = np.nanstd(hand[flood_labels == label])
@@ -184,7 +185,7 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
         known_water_threshold: Threshold for extracting the known water area in percent.
             If `None`, the threshold is calculated.
         iterative_bounds: Bounds on basin-hopping algorithm used in iterative estimation
-        min_metric : Evaluation method to minimize in iterative estimation
+        minimization_metric : Evaluation method to minimize in iterative estimation
 
     References:
         Jean-Francios Pekel, Andrew Cottam, Noel Gorelik, Alan S. Belward. 2016. <https://doi:10.1038/nature20584>
