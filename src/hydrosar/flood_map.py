@@ -90,8 +90,8 @@ def iterative(hand: np.array, extent: np.array, water_levels: np.array = np.aran
     MINIMIZATION_FUNCTION = {'fmi': _goal_fmi, 'ts': _goal_ts}
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=RuntimeWarning)
-        opt_res = optimize.basinhopping(MINIMIZATION_FUNCTION[minimization_metric], np.mean(water_levels), niter=10000, niter_success=100,
-                                        accept_test=bounds, stepsize=3)
+        opt_res = optimize.basinhopping(MINIMIZATION_FUNCTION[minimization_metric], np.mean(water_levels),
+                                        niter=10000, niter_success=100, accept_test=bounds, stepsize=3)
 
     if opt_res.message[0] == 'success condition satisfied' \
             or opt_res.message[0] == 'requested number of basinhopping iterations completed successfully':
@@ -116,12 +116,16 @@ def logstat(data: np.ndarray, func: Callable = np.nanstd) -> Union[np.ndarray, f
     return np.exp(st)
 
 
-def estimate_flood_depth(label, hand, flood_labels, estimator='iterative', water_level_sigma=3.,
-                         iterative_bounds=(0, 15), minimization_metric: str = 'fmi'):
+def estimate_flood_depth(label: int, hand: np.ndarray, flood_labels: np.ndarray, estimator: str = 'iterative',
+                         water_level_sigma: float = 3., iterative_bounds: Tuple[int, int] = (0, 15),
+                         iterative_min_area: int = 100, minimization_metric: str = 'fmi') -> float:
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', r'Mean of empty slice')
 
         if estimator.lower() == "iterative":
+            if (flood_labels == label).sum() < iterative_min_area:
+                return np.nan
+
             water_levels = np.arange(*iterative_bounds)
             return iterative(hand, flood_labels == label,
                              water_levels=water_levels, minimization_metric=minimization_metric)
