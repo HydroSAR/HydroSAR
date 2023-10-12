@@ -23,6 +23,7 @@ from scipy import ndimage, optimize, stats
 from tqdm import tqdm
 
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
+from asf_tools.hand.calculate import fill_nan
 from asf_tools.raster import read_as_masked_array, write_cog
 from asf_tools.util import get_coordinates, get_epsg_code
 
@@ -148,6 +149,17 @@ def estimate_flood_depth(label: int, hand: np.ndarray, flood_labels: np.ndarray,
     return hand_mean + water_level_sigma * hand_std
 
 
+def fill_missing_flood_depth(flood_depth: np.ndarray) -> np.ndarray:
+    nan_mask = np.isnan(flood_depth)
+
+    flood_depth_filled = flood_depth.copy()
+    flood_depth_filled[flood_depth == 0] = np.nan
+    flood_depth_filled = fill_nan(flood_depth_filled)
+
+    flood_depth[nan_mask] = flood_depth_filled[nan_mask]
+    return flood_depth
+
+
 def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
                    water_raster: Union[str, Path], hand_raster: Union[str, Path],
                    estimator: str = 'iterative',
@@ -236,6 +248,9 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
         flood_depth_window[flood_window == ll] = water_height - hand_window[flood_window == ll]
 
     flood_depth[flood_depth < 0] = 0
+
+    if estimator == 'iterative' and np.any(np.isnan(flood_depth)):
+        flood_depth = fill_missing_flood_depth(flood_depth)
 
     nodata = -1
     flood_depth[padding_mask] = nodata
