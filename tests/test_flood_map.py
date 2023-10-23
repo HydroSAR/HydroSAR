@@ -4,8 +4,8 @@ from osgeo_utils.gdalcompare import find_diff
 
 from osgeo import gdal
 
-import asf_tools.util
 from asf_tools.hydrosar import flood_map
+
 
 @pytest.mark.integration
 def test_get_waterbody():
@@ -65,12 +65,12 @@ def test_estimate_flood_depths_numpy(flood_window, hand_window):
 
 @pytest.mark.integration
 def test_make_flood_map(tmp_path):
-    water_raster = '/vsicurl/https://hyp3-testing.s3.us-west-2.amazonaws.com/asf-tools/S1A_IW_20230228T120437_DVR_RTC30/' \
-                   'flood_map/watermap.tif'
-    vv_raster = '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/asf-tools/S1A_IW_20230228T120437_DVR_RTC30/' \
-                'flood_map/RTC_VV.tif'
-    hand_raster = '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/asf-tools/S1A_IW_20230228T120437_DVR_RTC30/' \
-                  'flood_map/watermap_HAND.tif'
+    water_raster = '/vsicurl/https://hyp3-testing.s3.us-west-2.amazonaws.com/asf-tools/' \
+                    'S1A_IW_20230228T120437_DVR_RTC30/flood_map/watermap.tif'
+    vv_raster = '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/asf-tools/' \
+                'S1A_IW_20230228T120437_DVR_RTC30/flood_map/RTC_VV.tif'
+    hand_raster = '/vsicurl/https://hyp3-testing.s3-us-west-2.amazonaws.com/asf-tools/' \
+                  'S1A_IW_20230228T120437_DVR_RTC30/flood_map/watermap_HAND.tif'
 
     out_flood_map = tmp_path / 'flood_map.tif'
     flood_map.make_flood_map(out_flood_map, vv_raster, water_raster, hand_raster, estimator='nmad')
