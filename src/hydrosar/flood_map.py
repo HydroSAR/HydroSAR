@@ -24,7 +24,7 @@ from tqdm import tqdm
 
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
 from asf_tools.raster import read_as_masked_array, write_cog
-from asf_tools.util import get_epsg_code, get_coordinates
+from asf_tools.util import get_coordinates, get_epsg_code
 
 log = logging.getLogger(__name__)
 
