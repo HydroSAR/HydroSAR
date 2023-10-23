@@ -250,8 +250,10 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
     flood_depth[flood_depth < 0] = 0
 
     if estimator == 'iterative' and np.any(np.isnan(flood_depth)):
+        log.info('Filling missing flood depths')
         flood_depth = fill_missing_flood_depth(flood_depth)
 
+    log.info('Writing flood rasters')
     nodata = -1
     flood_depth[padding_mask] = nodata
 
@@ -374,7 +376,7 @@ def hyp3():
         minimization_metric=args.minimization_metric
     )
 
-    log.info(f"Flood depth map created successfully: {flood_map_raster}")
+    log.info(f'Flood depth map created successfully: {flood_map_raster}')
 
     if args.bucket:
         output_zip = make_archive(base_name=product_name, format='zip', base_dir=product_name)
