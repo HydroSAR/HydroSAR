@@ -9,8 +9,7 @@ from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
 from asf_tools import vector
-from asf_tools.composite import get_epsg_code
-from asf_tools.util import GDALConfigManager
+from asf_tools.util import GDALConfigManager, get_epsg_code
 
 HAND_GEOJSON = '/vsicurl/https://glo-30-hand.s3.amazonaws.com/v1/2021/glo-30-hand.geojson'
 

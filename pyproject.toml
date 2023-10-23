@@ -39,7 +39,7 @@ dynamic = ["version"]
 [project.scripts]
 make_composite = "asf_tools.composite:main"
 water_map = "asf_tools.hydrosar.water_map:main"
-calculate_hand = "asf_tools.hydroar.hand.calculate:main"
+calculate_hand = "asf_tools.hydrosar.hand.calculate:main"
 flood_map = "asf_tools.hydrosar.flood_map:main"
 
 [project.entry-points.hyp3]
@@ -70,3 +70,8 @@ zip-safe = false
 where = ["src"]
 
 [tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: long-running integration tests",
+]

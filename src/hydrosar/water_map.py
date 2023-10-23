@@ -19,11 +19,11 @@ from osgeo import gdal
 from skimage import measure
 
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
-from asf_tools.composite import get_epsg_code, write_cog
 from asf_tools.hydrosar.hand.prepare import prepare_hand_for_raster
 from asf_tools.hydrosar.threshold import expectation_maximization_threshold as em_threshold
-from asf_tools.raster import read_as_masked_array
+from asf_tools.raster import read_as_masked_array, write_cog
 from asf_tools.tile import tile_array, untile_array
+from asf_tools.util import get_epsg_code
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ def determine_em_threshold(tiles: np.ndarray, scaling: float) -> float:
 
 def calculate_slope_magnitude(array: np.ndarray, pixel_size) -> np.ndarray:
     dx, dy = np.gradient(array)
-    magnitude = np.sqrt(dx**2, dy**2) / pixel_size
+    magnitude = np.sqrt(dx ** 2, dy ** 2) / pixel_size
     slope = np.arctan(magnitude) / np.pi * 180.
     return slope
 

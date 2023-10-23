@@ -23,16 +23,10 @@ from scipy import ndimage, optimize, stats
 from tqdm import tqdm
 
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
-from asf_tools.composite import get_epsg_code, write_cog
-from asf_tools.raster import read_as_masked_array
+from asf_tools.raster import read_as_masked_array, write_cog
+from asf_tools.util import get_epsg_code, get_coordinates
 
 log = logging.getLogger(__name__)
-
-
-def get_coordinates(info: dict) -> Tuple[int, int, int, int]:
-    west, south = info['cornerCoordinates']['lowerLeft']
-    east, north = info['cornerCoordinates']['upperRight']
-    return west, south, east, north
 
 
 def get_pw_threshold(water_array: np.array) -> float:
