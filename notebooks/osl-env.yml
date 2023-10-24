@@ -11,6 +11,8 @@ dependencies:
   - fiona
   - gdal>=3.2.0
   - hyp3_sdk>=1.1
+  - ipywidgets=7.7.3          # must match OSL base env!
+  - jupyterlab_widgets=1.1.2  # must match OSL base env!
   - jupyter
   - kernda
   - numpy
