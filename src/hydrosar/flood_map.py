@@ -58,7 +58,7 @@ def get_waterbody(input_info: dict, threshold: Optional[float] = None) -> np.arr
 
 
 def iterative(hand: np.array, extent: np.array, water_levels: np.array = np.arange(15),
-              minimization_metric: str = 'fmi'):
+              minimization_metric: str = 'ts'):
     def get_confusion_matrix(w):
         iterative_flood_extent = hand < w  # w=water level
         tp = np.nansum(np.logical_and(iterative_flood_extent == 1, extent == 1))  # true positive
@@ -118,7 +118,7 @@ def logstat(data: np.ndarray, func: Callable = np.nanstd) -> Union[np.ndarray, f
 
 def estimate_flood_depth(label: int, hand: np.ndarray, flood_labels: np.ndarray, estimator: str = 'iterative',
                          water_level_sigma: float = 3., iterative_bounds: Tuple[int, int] = (0, 15),
-                         iterative_min_area: int = 100, minimization_metric: str = 'fmi') -> float:
+                         iterative_min_area: int = 100, minimization_metric: str = 'ts') -> float:
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', r'Mean of empty slice')
 
@@ -154,7 +154,7 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
                    water_level_sigma: float = 3.,
                    known_water_threshold: Optional[float] = None,
                    iterative_bounds: Tuple[int, int] = (0, 15),
-                   minimization_metric: str = 'fmi'):
+                   minimization_metric: str = 'ts'):
     """Create a flood depth map from a surface water extent map.
 
     WARNING: This functionality is still under active development and the products
@@ -189,7 +189,8 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
         known_water_threshold: Threshold for extracting the known water area in percent.
             If `None`, the threshold is calculated.
         iterative_bounds: Bounds on basin-hopping algorithm used in iterative estimation
-        minimization_metric : Evaluation method to minimize in iterative estimation
+        minimization_metric : Evaluation method to minimize during the iterative flood depth calculation.
+            Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).
 
     References:
         Jean-Francios Pekel, Andrew Cottam, Noel Gorelik, Alan S. Belward. 2016. <https://doi:10.1038/nature20584>
@@ -303,8 +304,9 @@ def _get_cli(interface: Literal['hyp3', 'main']) -> argparse.ArgumentParser:
     parser.add_argument('--known-water-threshold', type=optional_float, default=None,
                         help='Threshold for extracting known water area in percent.'
                              ' If `None`, threshold will be calculated.')
-    parser.add_argument('--minimization-metric', type=str, default='fmi', choices=['fmi', 'ts'],
-                        help='Evaluation method to minimize in iterative estimation')
+    parser.add_argument('--minimization-metric', type=str, default='ts', choices=['fmi', 'ts'],
+                        help='Evaluation method to minimize during the iterative flood depth calculation. '
+                             'Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).')
 
     if interface == 'hyp3':
         parser.add_argument('--iterative-min', type=int, default=0)
