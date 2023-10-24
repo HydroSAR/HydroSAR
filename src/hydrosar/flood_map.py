@@ -315,7 +315,7 @@ def _get_cli(interface: Literal['hyp3', 'main']) -> argparse.ArgumentParser:
     parser.add_argument('--minimization-metric', type=str, default='ts', choices=['fmi', 'ts'],
                         help='Evaluation method to minimize when using the iterative estimator. '
                              'Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).')
-    parser.add_argument('--iterative-minimum-size', type=int, default=0,
+    parser.add_argument('--iterative-min-size', type=int, default=0,
                         help='Minimum size of a connected waterbody in pixels for calculating flood depths with the '
                              'iterative estimator. Waterbodies smaller than this wll be skipped.')
 
