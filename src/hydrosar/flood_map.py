@@ -123,7 +123,6 @@ def estimate_flood_depth(label: int, hand: np.ndarray, flood_labels: np.ndarray,
         warnings.filterwarnings('ignore', r'Mean of empty slice')
 
         if estimator.lower() == "iterative":
-            log.info(f'Skipping waterbodies less than {iterative_min_size} pixels.')
             if (flood_labels == label).sum() < iterative_min_size:
                 return np.nan
 
@@ -224,6 +223,8 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
     labeled_flood_mask, num_labels = ndimage.label(flood_mask)
     object_slices = ndimage.find_objects(labeled_flood_mask)
     log.info(f'Detected {num_labels} waterbodies...')
+    if estimator.lower() == 'iterative':
+        log.info(f'Skipping waterbodies less than {iterative_min_size} pixels.')
 
     flood_depth = np.zeros(flood_mask.shape)
 
