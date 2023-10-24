@@ -190,11 +190,12 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
         water_level_sigma: Max water height used in logstat, nmad, and numpy estimations
         known_water_threshold: Threshold for extracting the known water area in percent.
             If `None`, the threshold is calculated.
-        iterative_bounds: Bounds on basin-hopping algorithm used in iterative estimation
-        minimization_metric: Evaluation method to minimize during the iterative flood depth calculation.
+        iterative_bounds: Minimum and maximum bound on the flood depths calculated by the basin-hopping algorithm
+            used in the iterative estimator
+        minimization_metric: Evaluation method to minimize when using the iterative estimator.
             Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).
         iterative_min_size: Minimum size of a connected waterbody in pixels for calculating flood depths with the
-            iterative method. Waterbodies smaller than this wll be skipped.
+            iterative estimator. Waterbodies smaller than this wll be skipped.
 
     References:
         Jean-Francios Pekel, Andrew Cottam, Noel Gorelik, Alan S. Belward. 2016. <https://doi:10.1038/nature20584>
@@ -311,18 +312,21 @@ def _get_cli(interface: Literal['hyp3', 'main']) -> argparse.ArgumentParser:
                         help='Threshold for extracting known water area in percent.'
                              ' If `None`, threshold will be calculated.')
     parser.add_argument('--minimization-metric', type=str, default='ts', choices=['fmi', 'ts'],
-                        help='Evaluation method to minimize during the iterative flood depth calculation. '
+                        help='Evaluation method to minimize when using the iterative estimator. '
                              'Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).')
     parser.add_argument('--iterative-minimum-size', type=int, default=0,
                         help='Minimum size of a connected waterbody in pixels for calculating flood depths with the '
-                             'iterative method. Waterbodies smaller than this wll be skipped.')
+                             'iterative estimator. Waterbodies smaller than this wll be skipped.')
 
     if interface == 'hyp3':
-        parser.add_argument('--iterative-min', type=int, default=0)
-        parser.add_argument('--iterative-max', type=int, default=15)
+        parser.add_argument('--iterative-min', type=int, default=0,
+                            help='Minimum bound on the flood depths calculated using the iterative estimator.')
+        parser.add_argument('--iterative-max', type=int, default=15,
+                            help='Maximum bound on the flood depths calculated using the iterative estimator.')
     elif interface == 'main':
-        # FIXME: add a help string
-        parser.add_argument('--iterative-bounds', type=int, nargs=2, default=[0, 15])
+        parser.add_argument('--iterative-bounds', type=int, nargs=2, default=[0, 15],
+                            help='Minimum and maximum bound on the flood depths calculated using the iterative '
+                                 'estimator.')
     else:
         raise NotImplementedError(f'Unknown interface: {interface}')
 
