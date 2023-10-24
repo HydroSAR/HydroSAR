@@ -23,7 +23,7 @@ from scipy import ndimage, optimize, stats
 from tqdm import tqdm
 
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
-from asf_tools.hand.calculate import fill_nan
+from asf_tools.hydrosar.hand.calculate import fill_nan
 from asf_tools.raster import read_as_masked_array, write_cog
 from asf_tools.util import get_coordinates, get_epsg_code
 
