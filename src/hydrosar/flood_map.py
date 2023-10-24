@@ -155,8 +155,9 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
                    water_level_sigma: float = 3.,
                    known_water_threshold: Optional[float] = None,
                    iterative_bounds: Tuple[int, int] = (0, 15),
+                   iterative_min_size: int = 0,
                    minimization_metric: str = 'ts',
-                   iterative_min_size: int = 0):
+                   ):
     """Create a flood depth map from a surface water extent map.
 
     WARNING: This functionality is still under active development and the products
@@ -192,10 +193,10 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
             If `None`, the threshold is calculated.
         iterative_bounds: Minimum and maximum bound on the flood depths calculated by the basin-hopping algorithm
             used in the iterative estimator
-        minimization_metric: Evaluation method to minimize when using the iterative estimator.
-            Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).
         iterative_min_size: Minimum size of a connected waterbody in pixels for calculating flood depths with the
             iterative estimator. Waterbodies smaller than this wll be skipped.
+        minimization_metric: Evaluation method to minimize when using the iterative estimator.
+            Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).
 
     References:
         Jean-Francios Pekel, Andrew Cottam, Noel Gorelik, Alan S. Belward. 2016. <https://doi:10.1038/nature20584>
@@ -371,7 +372,7 @@ def hyp3():
         out_raster=flood_map_raster, vv_raster=vv_raster, water_raster=water_map_raster, hand_raster=hand_raster,
         estimator=args.estimator, water_level_sigma=args.water_level_sigma,
         known_water_threshold=args.known_water_threshold, iterative_bounds=(args.iterative_min, args.iterative_max),
-        minimization_metric=args.minimization_metric, iterative_min_size=args.iterative_min_size,
+        iterative_min_size=args.iterative_min_size, minimization_metric=args.minimization_metric,
     )
 
     log.info(f'Flood depth map created successfully: {flood_map_raster}')
@@ -391,8 +392,11 @@ def main():
     logging.basicConfig(stream=sys.stdout, format='%(asctime)s - %(levelname)s - %(message)s', level=level)
     log.debug(' '.join(sys.argv))
 
-    make_flood_map(args.out_raster, args.vv_raster, args.water_extent_map, args.hand_raster,
-                   args.estimator, args.water_level_sigma, args.known_water_threshold, tuple(args.iterative_bounds),
-                   args.minimization_metric, args.iterative_min_size)
+    make_flood_map(
+        out_raster=args.out_raster, vv_raster=args.vv_raster, water_raster=args.water_extent_map,
+        hand_raster=args.hand_raster, estimator=args.estimator, water_level_sigma=args.water_level_sigma,
+        known_water_threshold=args.known_water_threshold, iterative_bounds=tuple(args.iterative_bounds),
+        iterative_min_size=args.iterative_min_size, minimization_metric=args.minimization_metric,
+    )
 
     log.info(f"Flood depth map created successfully: {args.out_raster}")
