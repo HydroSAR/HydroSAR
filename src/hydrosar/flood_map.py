@@ -118,12 +118,13 @@ def logstat(data: np.ndarray, func: Callable = np.nanstd) -> Union[np.ndarray, f
 
 def estimate_flood_depth(label: int, hand: np.ndarray, flood_labels: np.ndarray, estimator: str = 'iterative',
                          water_level_sigma: float = 3., iterative_bounds: Tuple[int, int] = (0, 15),
-                         iterative_min_area: int = 100, minimization_metric: str = 'ts') -> float:
+                         iterative_min_size: int = 0, minimization_metric: str = 'ts') -> float:
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', r'Mean of empty slice')
 
         if estimator.lower() == "iterative":
-            if (flood_labels == label).sum() < iterative_min_area:
+            log.info(f'Skipping waterbodies less than {iterative_min_size} pixels.')
+            if (flood_labels == label).sum() < iterative_min_size:
                 return np.nan
 
             water_levels = np.arange(*iterative_bounds)
@@ -154,7 +155,8 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
                    water_level_sigma: float = 3.,
                    known_water_threshold: Optional[float] = None,
                    iterative_bounds: Tuple[int, int] = (0, 15),
-                   minimization_metric: str = 'ts'):
+                   minimization_metric: str = 'ts',
+                   iterative_min_size: int = 0):
     """Create a flood depth map from a surface water extent map.
 
     WARNING: This functionality is still under active development and the products
@@ -189,8 +191,10 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
         known_water_threshold: Threshold for extracting the known water area in percent.
             If `None`, the threshold is calculated.
         iterative_bounds: Bounds on basin-hopping algorithm used in iterative estimation
-        minimization_metric : Evaluation method to minimize during the iterative flood depth calculation.
+        minimization_metric: Evaluation method to minimize during the iterative flood depth calculation.
             Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).
+        iterative_min_size: Minimum size of a connected waterbody in pixels for calculating flood depths with the
+            iterative method. Waterbodies smaller than this wll be skipped.
 
     References:
         Jean-Francios Pekel, Andrew Cottam, Noel Gorelik, Alan S. Belward. 2016. <https://doi:10.1038/nature20584>
@@ -217,7 +221,7 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
 
     labeled_flood_mask, num_labels = ndimage.label(flood_mask)
     object_slices = ndimage.find_objects(labeled_flood_mask)
-    log.info(f'Detected {num_labels} water bodies...')
+    log.info(f'Detected {num_labels} waterbodies...')
 
     flood_depth = np.zeros(flood_mask.shape)
 
@@ -229,9 +233,11 @@ def make_flood_map(out_raster: Union[str, Path], vv_raster: Union[str, Path],
         flood_window = labeled_flood_mask[min0:max0, min1:max1]
         hand_window = hand_array[min0:max0, min1:max1]
 
-        water_height = estimate_flood_depth(ll, hand_window, flood_window, estimator=estimator,
-                                            water_level_sigma=water_level_sigma, iterative_bounds=iterative_bounds,
-                                            minimization_metric=minimization_metric)
+        water_height = estimate_flood_depth(
+            ll, hand_window, flood_window, estimator=estimator, water_level_sigma=water_level_sigma,
+            iterative_bounds=iterative_bounds, minimization_metric=minimization_metric,
+            iterative_min_size=iterative_min_size,
+        )
 
         flood_depth_window = flood_depth[min0:max0, min1:max1]
         flood_depth_window[flood_window == ll] = water_height - hand_window[flood_window == ll]
@@ -307,6 +313,9 @@ def _get_cli(interface: Literal['hyp3', 'main']) -> argparse.ArgumentParser:
     parser.add_argument('--minimization-metric', type=str, default='ts', choices=['fmi', 'ts'],
                         help='Evaluation method to minimize during the iterative flood depth calculation. '
                              'Options include a Fowlkes-Mallows index (fmi) or a threat score (ts).')
+    parser.add_argument('--iterative-minimum-size', type=int, default=0,
+                        help='Minimum size of a connected waterbody in pixels for calculating flood depths with the '
+                             'iterative method. Waterbodies smaller than this wll be skipped.')
 
     if interface == 'hyp3':
         parser.add_argument('--iterative-min', type=int, default=0)
@@ -380,6 +389,6 @@ def main():
 
     make_flood_map(args.out_raster, args.vv_raster, args.water_extent_map, args.hand_raster,
                    args.estimator, args.water_level_sigma, args.known_water_threshold, tuple(args.iterative_bounds),
-                   args.minimization_metric)
+                   args.minimization_metric, args.iterative_min_size)
 
     log.info(f"Flood depth map created successfully: {args.out_raster}")
