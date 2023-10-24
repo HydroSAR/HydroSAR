@@ -371,7 +371,7 @@ def hyp3():
         out_raster=flood_map_raster, vv_raster=vv_raster, water_raster=water_map_raster, hand_raster=hand_raster,
         estimator=args.estimator, water_level_sigma=args.water_level_sigma,
         known_water_threshold=args.known_water_threshold, iterative_bounds=(args.iterative_min, args.iterative_max),
-        minimization_metric=args.minimization_metric
+        minimization_metric=args.minimization_metric, iterative_min_size=args.iterative_min_size,
     )
 
     log.info(f'Flood depth map created successfully: {flood_map_raster}')
