@@ -14,7 +14,7 @@ jobs:
   call-pytest-workflow:
     uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@v0.8.2
     with:
-      local_package_name: asf_tools
+      local_package_name: hydrosar
 
   call-version-info-workflow:
     uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.8.2

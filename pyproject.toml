@@ -3,13 +3,10 @@ requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "asf_tools"
+name = "hydrosar"
 requires-python = ">=3.8"
-authors = [
-    {name="ASF APD/Tools Team", email="uaf-asf-apd@alaska.edu"},
-]
-description = "Tools developed by ASF for working with SAR data"
-readme = "src/asf_tools/README.md"
+description = "Algorithms for the monitoring of hydrological hazards using data from Synthetic Aperture Radar (SAR) sensors"
+readme = "README.md"
 license = {text = "BSD-3-Clause"}
 classifiers=[
     "Intended Audience :: Science/Research",
@@ -20,6 +17,7 @@ classifiers=[
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
     "astropy",
@@ -37,14 +35,13 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-make_composite = "asf_tools.composite:main"
-water_map = "asf_tools.hydrosar.water_map:main"
-calculate_hand = "asf_tools.hydrosar.hand.calculate:main"
-flood_map = "asf_tools.hydrosar.flood_map:main"
+make_HYDRO30 = "hydrosar.water_map:main"
+calculate_hand = "hydrosar.hand.calculate:main"
+make_FD30 = "hydrosar.flood_map:main"
 
 [project.entry-points.hyp3]
-water_map = "asf_tools.hydrosar.water_map:hyp3"
-flood_map = "asf_tools.hydrosar.flood_map:hyp3"
+HYDRO30 = "hydrosar.water_map:hyp3"
+FD30 = "hydrosar.flood_map:hyp3"
 
 [project.optional-dependencies]
 develop = [
@@ -59,8 +56,8 @@ develop = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ASFHyP3/asf-tools"
-"Bug Tracker" = "https://github.com/ASFHyP3/asf-tools/issues"
+Homepage = "https://github.com/fjmeyer/HydroSAR"
+"Bug Tracker" = "https://github.com/fjmeyer/HydroSAR/issues"
 
 [tool.setuptools]
 include-package-data = true

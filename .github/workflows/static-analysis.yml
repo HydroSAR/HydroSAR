@@ -3,25 +3,10 @@ name: Static analysis
 on: push
 
 jobs:
-  flake8:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install flake8  flake8-import-order flake8-blind-except flake8-builtins
-
-      - name: Lint with flake8
-        run: |
-          flake8 --max-line-length=120 --import-order-style=pycharm --statistics \
-              --application-import-names asf_tools ArcGIS-toolbox/ASF_Tools.pyt src/asf_tools
-
+  call-flake8-workflow:
+    uses: ASFHyP3/actions/.github/workflows/reusable-flake8.yml@v0.8.2
+    with:
+      local_package_names: hydrosar
 
   call-secrets-analysis-workflow:
     uses: ASFHyP3/actions/.github/workflows/reusable-secrets-analysis.yml@v0.8.2

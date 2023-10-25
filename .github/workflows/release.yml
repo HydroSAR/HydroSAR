@@ -1,66 +1,15 @@
-name: Write release and finish
+name: Create Release
 
 on:
   push:
     tags:
-      - v*
+      - 'v*'
 
 jobs:
-  finish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.TOOLS_BOT_PAK }}
-
-      - name: Build release asset names
-        id: release_assets
-        run: |
-          echo ::set-output name=version_tag::${GITHUB_REF#refs/tags/}
-          echo ::set-output name=ARC_FILE::ASF_ArcGIS_Toolbox_$(echo ${GITHUB_REF#refs/tags/}).zip
-
-      - name: Zip ArcGIS Toolbox
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -j -r ${{ steps.release_assets.outputs.ARC_FILE }} ArcGIS-toolbox
-
-      - name: Create Release
-        uses: docker://antonyurchenko/git-release:v3.5.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
-          ALLOW_TAG_PREFIX: "true"
-          RELEASE_NAME_PREFIX: "ASF Tools "
-        with:
-          args: |
-            ${{ steps.release_assets.outputs.ARC_FILE }}
-
-      - name: Bump ASF Tools version in HyP3 docs
-        uses: benc-uk/workflow-dispatch@v1.2
-        with:
-          workflow: update_asf_tools_version.yml
-          token: ${{ secrets.TOOLS_BOT_PAK }}
-          repo: ASFHyP3/hyp3-docs
-          ref: main
-          inputs: '{"asf_tools_version": "${{ steps.release_assets.outputs.version_tag }}"}'
-
-      - name: Attempt fast-forward develop from main
-        run: |
-          git fetch --prune
-          git checkout develop && git pull --ff-only
-          git merge --ff-only origin/main
-          git push
-
-      - name: Open PR to bring main back to develop
-        if: ${{ failure() }}
-        uses: repo-sync/pull-request@v2
-        with:
-          source_branch: main
-          destination_branch: develop
-          pr_title: Pulling ${{ github.ref }} into default
-          pr_body: Fast-forward of main to default failed!
-          pr_assignee: ${{ github.actor }}
-          pr_label: tools-bot
-          pr_draft: false
-          pr_allow_empty: true
-          github_token: ${{ secrets.TOOLS_BOT_PAK }}
+  call-release-workflow:
+    uses: ASFHyP3/actions/.github/workflows/reusable-release.yml@v0.8.2
+    with:
+      release_prefix: HydroSAR
+      sync_pr_label: tools-bot  # Optional; default shown
+    secrets:
+      USER_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}

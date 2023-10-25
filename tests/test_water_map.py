@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
-from osgeo_utils.gdalcompare import find_diff
-
-from asf_tools.hydrosar import water_map
 from asf_tools.raster import read_as_array
 from asf_tools.tile import tile_array
+from osgeo_utils.gdalcompare import find_diff
+
+from hydrosar import water_map
 
 
 def test_determine_em_threshold(raster_tiles):

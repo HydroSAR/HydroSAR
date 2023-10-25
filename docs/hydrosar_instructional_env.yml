@@ -1,4 +1,4 @@
-name: hydrosar
+name: hydrosar-instructional
 channels:
   - conda-forge
   - defaults

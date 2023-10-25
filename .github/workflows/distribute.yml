@@ -49,6 +49,6 @@ jobs:
         with:
           environment-file: environment.yml
 
-      - name: Ensure asf_tools v${{ needs.call-version-info-workflow.outputs.version }}} is pip installable
+      - name: Ensure hydrosar v${{ needs.call-version-info-workflow.outputs.version }}} is pip installable
         run: |
-          python -m pip install asf_tools==${{ needs.call-version-info-workflow.outputs.version_tag }}
+          python -m pip install hydrosar==${{ needs.call-version-info-workflow.outputs.version_tag }}

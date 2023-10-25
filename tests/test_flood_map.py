@@ -1,10 +1,9 @@
 import numpy as np
 import pytest
+from osgeo import gdal
 from osgeo_utils.gdalcompare import find_diff
 
-from osgeo import gdal
-
-from asf_tools.hydrosar import flood_map
+from hydrosar import flood_map
 
 
 @pytest.mark.integration

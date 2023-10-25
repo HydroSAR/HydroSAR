@@ -18,13 +18,12 @@ from shutil import make_archive
 from typing import Callable, Literal, Optional, Tuple, Union
 
 import numpy as np
-from osgeo import gdal
-from scipy import ndimage, optimize, stats
-from tqdm import tqdm
-
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
 from asf_tools.raster import read_as_masked_array, write_cog
 from asf_tools.util import get_coordinates, get_epsg_code
+from osgeo import gdal
+from scipy import ndimage, optimize, stats
+from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 

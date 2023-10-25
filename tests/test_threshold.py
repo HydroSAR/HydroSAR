@@ -1,6 +1,6 @@
 import numpy as np
 
-from asf_tools.hydrosar.threshold import expectation_maximization_threshold
+from hydrosar.threshold import expectation_maximization_threshold
 
 
 def test_determine_em_threshold(raster_tiles, thresholds):

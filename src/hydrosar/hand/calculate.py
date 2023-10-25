@@ -12,11 +12,10 @@ import fiona
 import numpy as np
 import rasterio.crs
 import rasterio.mask
-from pysheds.sgrid import sGrid
-from shapely.geometry import GeometryCollection, shape
-
 from asf_tools.dem import prepare_dem_vrt
 from asf_tools.raster import write_cog
+from pysheds.sgrid import sGrid
+from shapely.geometry import GeometryCollection, shape
 
 log = logging.getLogger(__name__)
 

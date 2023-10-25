@@ -1,4 +1,4 @@
-name: asf-tools
+name: hydrosar-on-demand
 channels:
   - conda-forge
   - nodefaults

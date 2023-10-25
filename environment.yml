@@ -1,13 +1,11 @@
-name: asf-tools
+name: hydrosar
 channels:
   - conda-forge
-  # - esri  # windows only
   - nodefaults
 dependencies:
   - python>=3.8
   - pip
   # For packaging, and testing
-  # - arcpy  # windows only
   - build
   - flake8
   - flake8-import-order
@@ -19,6 +17,7 @@ dependencies:
   - pytest-console-scripts
   - pytest-cov
   # For running
+  - asf_tools
   - astropy
   - boto3
   - fiona

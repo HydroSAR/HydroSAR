@@ -1,4 +1,4 @@
 #!/bin/bash --login
 set -e
-conda activate asf-tools
-exec python -um asf_tools "$@"
+conda activate hydrosar
+exec python -um hydrosar "$@"
