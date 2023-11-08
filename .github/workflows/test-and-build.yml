@@ -25,4 +25,4 @@ jobs:
     with:
       version_tag: ${{ needs.call-version-info-workflow.outputs.version_tag }}
     secrets:
-      USER_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
+      USER_TOKEN: ${{ secrets.HYDROSAR_RELEASE_TOKEN }}

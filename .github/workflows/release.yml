@@ -12,4 +12,4 @@ jobs:
       release_prefix: HydroSAR
       sync_pr_label: tools-bot  # Optional; default shown
     secrets:
-      USER_TOKEN: ${{ secrets.TOOLS_BOT_PAK }}
+      USER_TOKEN: ${{ secrets.HYDROSAR_RELEASE_TOKEN }}
