@@ -1,0 +1,35 @@
+name: hydrosar
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python>=3.8
+  - pip
+  # For packaging, and testing
+  - build
+  - flake8
+  - flake8-import-order
+  - flake8-blind-except
+  - flake8-builtins
+  - setuptools>=61
+  - setuptools_scm>=6.2
+  - pytest
+  - pytest-console-scripts
+  - pytest-cov
+  # For running
+  - asf_tools
+  - astropy
+  - boto3
+  - fiona
+  - gdal>=3.7
+  - numpy
+  - pysheds>=0.3
+  - rasterio
+  - scikit-fuzzy
+  - scikit-image
+  - scipy
+  - shapely
+  - tqdm
+  - pip:
+    # for testing
+    - gdal-utils

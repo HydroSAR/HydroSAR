@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hydrosar"
+requires-python = ">=3.8"
+description = "Algorithms for the monitoring of hydrological hazards using data from Synthetic Aperture Radar (SAR) sensors"
+readme = "README.md"
+license = {text = "BSD-3-Clause"}
+classifiers=[
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "astropy",
+    "fiona",
+    "gdal>=3.3",
+    "numpy",
+    "pysheds>=0.3",
+    "rasterio",
+    "scikit-fuzzy",
+    "scikit-image",
+    "scipy",
+    "shapely",
+    "tqdm",
+]
+dynamic = ["version"]
+
+[project.scripts]
+make_HYDRO30 = "hydrosar.water_map:main"
+calculate_hand = "hydrosar.hand.calculate:main"
+make_FD30 = "hydrosar.flood_map:main"
+
+[project.entry-points.hyp3]
+HYDRO30 = "hydrosar.water_map:hyp3"
+FD30 = "hydrosar.flood_map:hyp3"
+
+[project.optional-dependencies]
+develop = [
+    "flake8",
+    "flake8-import-order",
+    "flake8-blind-except",
+    "flake8-builtins",
+    "gdal-utils",
+    "pytest",
+    "pytest-cov",
+    "pytest-console-scripts",
+]
+
+[project.urls]
+Homepage = "https://github.com/fjmeyer/HydroSAR"
+"Bug Tracker" = "https://github.com/fjmeyer/HydroSAR/issues"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+# To ignore asf_tools_v* tags; all but the last element should match setuptools_scm.git.DEFAULT_DESCRIBE:
+# https://setuptools-scm.readthedocs.io/en/latest/config/#setuptools_scm.git.DEFAULT_DESCRIBE
+git_describe_command = ['git', 'describe', '--dirty', '--tags', '--long', '--match', 'v*[0-9]*']
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: long-running integration tests",
+]
