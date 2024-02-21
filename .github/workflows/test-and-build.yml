@@ -12,16 +12,16 @@ on:
 
 jobs:
   call-pytest-workflow:
-    uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@v0.8.2
+    uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@v0.11.0
     with:
       local_package_name: hydrosar
 
   call-version-info-workflow:
-    uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.8.2
+    uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.11.0
 
   call-docker-ghcr-workflow:
     needs: call-version-info-workflow
-    uses: ASFHyP3/actions/.github/workflows/reusable-docker-ghcr.yml@v0.8.2
+    uses: ASFHyP3/actions/.github/workflows/reusable-docker-ghcr.yml@v0.11.0
     with:
       version_tag: ${{ needs.call-version-info-workflow.outputs.version_tag }}
     secrets:
