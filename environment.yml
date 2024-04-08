@@ -17,7 +17,7 @@ dependencies:
   - pytest-console-scripts
   - pytest-cov
   # For running
-  - asf_tools
+  - asf_tools>=0.6
   - astropy
   - boto3
   - fiona

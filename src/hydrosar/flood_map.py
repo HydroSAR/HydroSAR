@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 def get_pw_threshold(water_array: np.array) -> float:
     hist, bin_edges = np.histogram(water_array, density=True, bins=100)
     reverse_cdf = np.cumsum(np.flipud(hist)) * (bin_edges[1] - bin_edges[0])
-    ths_orig = np.flipud(bin_edges)[np.searchsorted(np.array(reverse_cdf), 0.95)]
+    ths_orig = np.flipud(bin_edges)[np.searchsorted(np.array(reverse_cdf), 0.68)]
     return round(ths_orig) + 1
 
 
