@@ -1,0 +1,28 @@
+name: hydrosar
+channels: 
+  - conda-forge
+dependencies:
+  # - python==3.11
+  - affine
+  - astropy
+  - cdsapi
+  - ciso8601
+  - contextily
+  - fiona
+  - gdal
+  - geopandas
+  - hydrosar
+  - hyp3_sdk
+  - ipyfilechooser
+  - ipykernel
+  - ipympl
+  - jupyterlab
+  - matplotlib
+  - numpy  
+  - opensarlab_lib
+  - pandas
+  - pip
+  - pyproj
+  - rasterio
+  - scikit-fuzzy
+  - xarray

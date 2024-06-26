@@ -1,0 +1,36 @@
+format: jb-book
+root: README
+parts:
+  - caption: Start Here
+    chapters:
+      - file: notebooks/jupyter_book/jupyter_book_content/start_here.md
+      - file: README.md
+  - caption: Set Up
+    chapters:
+      - file: notebooks/jupyter_book/jupyter_book_content/Software_Environments.ipynb
+      # - file: docs/Jupyter_Book/Jupyter_Book_Content/CDS_Access.ipynb
+  - caption: Data Access
+    chapters:
+      - file: notebooks/jupyter_book/jupyter_book_content/Prepare_HydroSAR_RTC_Stack
+      # - file: docs/Jupyter_Book/Jupyter_Book_Content/ERA5_Download.ipynb
+  - caption: HydroSAR
+    chapters:
+      - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Stack_Processing.ipynb
+      - file: notebooks/jupyter_book/jupyter_book_content/hydrosar-on-demand.ipynb
+      - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Detailed_Walkthrough.ipynb
+  - caption: Extras
+    chapters:
+      - file: notebooks/jupyter_book/jupyter_book_content/Subset_HydroSAR_Stack.ipynb
+  - caption: Resources
+    chapters:
+    - url: https://github.com/HydroSAR/HydroSAR
+      title: HydroSAR GitHub Repository
+    - url: https://servir.icimod.org/events/hydrosar-training-extracting-flood-information-from-sar/
+      title: SERVIR HydroSAR Training
+    - url: https://ieeexplore.ieee.org/document/9553203
+      title: Monitoring Weather-Related Hazards Using the HydroSAR Service
+    - url: https://www.icimod.org/capacity-building/2021/SERVIR%20flood%20inundation%20mapping%20service/QuickGuide_SurfaceWaterExtent_ICIMOD_Aug2021.pdf
+      title: HydroSAR – Hydro30 Surface Water Extent Quick Guide
+
+
+      
