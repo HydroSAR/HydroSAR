@@ -9,8 +9,8 @@ Maximization thresholding approach and refined using Fuzzy Logic.
 import argparse
 import logging
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 from shutil import make_archive
 from typing import Literal, Optional, Tuple, Union
 
@@ -38,27 +38,36 @@ def mean_of_subtiles(tiles: np.ndarray) -> np.ndarray:
     return sub_tiles_mean
 
 
-def select_hand_tiles(tiles: Union[np.ndarray, np.ma.MaskedArray],
-                      hand_threshold: float, hand_fraction: float) -> np.ndarray:
+def select_hand_tiles(
+    tiles: Union[np.ndarray, np.ma.MaskedArray],
+    hand_threshold: float,
+    hand_fraction: float,
+) -> np.ndarray:
     if np.allclose(tiles, 0.0):
-        raise ValueError(f'All pixels in scene have a HAND value of {0.0} (all water); '
-                         f'scene is not a good candidate for water mapping.')
+        raise ValueError(
+            f"All pixels in scene have a HAND value of {0.0} (all water); "
+            f"scene is not a good candidate for water mapping."
+        )
 
     tile_indexes = np.arange(tiles.shape[0])
 
     tiles = np.ma.masked_greater_equal(tiles, hand_threshold)
-    percent_valid_pixels = np.sum(~tiles.mask, axis=(1, 2)) / (tiles.shape[1] * tiles.shape[2])
+    percent_valid_pixels = np.sum(~tiles.mask, axis=(1, 2)) / (
+        tiles.shape[1] * tiles.shape[2]
+    )
 
     return tile_indexes[percent_valid_pixels > hand_fraction]
 
 
-def select_backscatter_tiles(backscatter_tiles: np.ndarray, hand_candidates: np.ndarray) -> np.ndarray:
+def select_backscatter_tiles(
+    backscatter_tiles: np.ndarray, hand_candidates: np.ndarray
+) -> np.ndarray:
     """
     Select 5 tiles whose:
         - median is below the median of tile medians
         - has a corresponding HAND candidate
-        - is accompanied by 4 other tiles, all of whose variances lie above the highest possible variance percentile,  
-          starting at the 95th and working backwards in 5% increments
+        - is accompanied by 4 other tiles, all of whose variances lie above the highest possible variance percentile,
+        starting at the 95th and working backwards in 5% increments
           - if 5 tiles are not found with variences > 95th percentile, we try the 90th, 85th, etc...
     """
     tile_indexes = np.arange(backscatter_tiles.shape[0])
@@ -74,7 +83,9 @@ def select_backscatter_tiles(backscatter_tiles: np.ndarray, hand_candidates: np.
     potential_candidates = np.intersect1d(hand_candidates, low_mean_candidates)
 
     # iterate across 5 percentile increments of tile_varience in reverse order
-    for variance_threshold in np.nanpercentile(tile_variance.filled(np.nan), np.arange(5, 96)[::-1]):
+    for variance_threshold in np.nanpercentile(
+        tile_variance.filled(np.nan), np.arange(5, 96)[::-1]
+    ):
         variance_candidates = tile_indexes[tile_variance > variance_threshold]
         selected = np.intersect1d(variance_candidates, potential_candidates)
         sort_index = np.argsort(sub_tile_means_std[selected])[::-1]
@@ -94,28 +105,35 @@ def determine_em_threshold(tiles: np.ndarray, scaling: float) -> float:
 
 def calculate_slope_magnitude(array: np.ndarray, pixel_size) -> np.ndarray:
     dx, dy = np.gradient(array)
-    magnitude = np.sqrt(dx ** 2, dy ** 2) / pixel_size
-    slope = np.arctan(magnitude) / np.pi * 180.
+    magnitude = np.sqrt(dx**2, dy**2) / pixel_size
+    slope = np.arctan(magnitude) / np.pi * 180.0
     return slope
 
 
 def determine_membership_limits(
-        array: np.ndarray, mask_percentile: float = 90., std_range: float = 3.0) -> Tuple[float, float]:
-    array = np.ma.masked_values(array, 0.)
-    array = np.ma.masked_greater(array, np.nanpercentile(array.filled(np.nan), mask_percentile))
+    array: np.ndarray, mask_percentile: float = 90.0, std_range: float = 3.0
+) -> Tuple[float, float]:
+    array = np.ma.masked_values(array, 0.0)
+    array = np.ma.masked_greater(
+        array, np.nanpercentile(array.filled(np.nan), mask_percentile)
+    )
     lower_limit = np.ma.median(array)
     upper_limit = lower_limit + std_range * array.std() + 5.0
     return lower_limit, upper_limit
 
 
-def min_max_membership(array: np.ndarray, lower_limit: float, upper_limit: float, resolution: float) -> np.ndarray:
+def min_max_membership(
+    array: np.ndarray, lower_limit: float, upper_limit: float, resolution: float
+) -> np.ndarray:
     possible_values = np.arange(array.min(), array.max(), resolution)
     activation = fuzz.zmf(possible_values, lower_limit, upper_limit)
     membership = fuzz.interp_membership(possible_values, activation, array)
     return membership
 
 
-def segment_area_membership(segments: np.ndarray, min_area: int = 3, max_area: int = 10) -> np.ndarray:
+def segment_area_membership(
+    segments: np.ndarray, min_area: int = 3, max_area: int = 10
+) -> np.ndarray:
     segment_areas = np.bincount(segments.ravel())
 
     possible_areas = np.arange(min_area, max_area + 1)
@@ -124,12 +142,18 @@ def segment_area_membership(segments: np.ndarray, min_area: int = 3, max_area: i
     segment_membership = np.zeros_like(segments)
 
     segments_above_threshold = np.squeeze((segment_areas > max_area).nonzero())
-    segments_above_threshold = np.delete(segments_above_threshold, (segments_above_threshold == 0).nonzero())
+    segments_above_threshold = np.delete(
+        segments_above_threshold, (segments_above_threshold == 0).nonzero()
+    )
     np.putmask(segment_membership, np.isin(segments, segments_above_threshold), 1)
 
     for area in possible_areas:
         mask = np.isin(segments, (segment_areas == area).nonzero())
-        np.putmask(segment_membership, mask, fuzz.interp_membership(possible_areas, activation, area))
+        np.putmask(
+            segment_membership,
+            mask,
+            fuzz.interp_membership(possible_areas, activation, area),
+        )
     return segment_membership
 
 
@@ -156,69 +180,104 @@ def format_raster_data(raster, padding_mask=None, nodata=np.iinfo(np.uint8).max)
     return raster
 
 
-def fuzzy_refinement(initial_map: np.ndarray, gaussian_array: np.ndarray, hand_array: np.ndarray, pixel_size: float,
-                     gaussian_thresholds: Tuple[float, float], membership_threshold: float = 0.45) -> np.ndarray:
+def fuzzy_refinement(
+    initial_map: np.ndarray,
+    gaussian_array: np.ndarray,
+    hand_array: np.ndarray,
+    pixel_size: float,
+    gaussian_thresholds: Tuple[float, float],
+    membership_threshold: float = 0.45,
+) -> np.ndarray:
     water_map = np.ones_like(initial_map)
 
     water_segments = measure.label(initial_map, connectivity=2)
     water_segment_membership = segment_area_membership(water_segments)
-    water_map &= ~np.isclose(water_segment_membership, 0.)
+    water_map &= ~np.isclose(water_segment_membership, 0.0)
 
-    gaussian_membership = min_max_membership(gaussian_array, gaussian_thresholds[0], gaussian_thresholds[1], 0.005)
-    water_map &= ~np.isclose(gaussian_membership, 0.)
+    gaussian_membership = min_max_membership(
+        gaussian_array, gaussian_thresholds[0], gaussian_thresholds[1], 0.005
+    )
+    water_map &= ~np.isclose(gaussian_membership, 0.0)
 
     hand_lower_limit, hand_upper_limit = determine_membership_limits(hand_array)
-    hand_membership = min_max_membership(hand_array, hand_lower_limit, hand_upper_limit, 0.1)
-    water_map &= ~np.isclose(hand_membership, 0.)
+    hand_membership = min_max_membership(
+        hand_array, hand_lower_limit, hand_upper_limit, 0.1
+    )
+    water_map &= ~np.isclose(hand_membership, 0.0)
 
     hand_slopes = calculate_slope_magnitude(hand_array, pixel_size)
-    slope_membership = min_max_membership(hand_slopes, 0., 15., 0.1)
-    water_map &= ~np.isclose(slope_membership, 0.)
+    slope_membership = min_max_membership(hand_slopes, 0.0, 15.0, 0.1)
+    water_map &= ~np.isclose(slope_membership, 0.0)
 
-    water_map_weights = (gaussian_membership + hand_membership + slope_membership + water_segment_membership) / 4.
+    water_map_weights = (
+        gaussian_membership
+        + hand_membership
+        + slope_membership
+        + water_segment_membership
+    ) / 4.0
     water_map &= water_map_weights >= membership_threshold
 
     return water_map
 
 
 def adaptive_dynamic_thresholding(
-    raster: Union[str, os.PathLike], 
+    raster: Union[str, os.PathLike],
     array: np.ma.MaskedArray,
     max_db_threshold: float,
     tile_shape: Tuple[int, int],
-    hand_candidates: np.ndarray
+    hand_candidates: np.ndarray,
 ) -> Tuple[np.ma.MaskedArray, float]:
-    tiles = tile_array(array, tile_shape=tile_shape, pad_value=0.)
+    tiles = tile_array(array, tile_shape=tile_shape, pad_value=0.0)
     # Masking less than zero only necessary for old HyP3/GAMMA products which sometimes returned negative powers
-    tiles = np.ma.masked_less_equal(tiles, 0.)
+    tiles = np.ma.masked_less_equal(tiles, 0.0)
     selected_tiles = select_backscatter_tiles(tiles, hand_candidates)
-    log.info(f'Selected tiles {selected_tiles} from {raster}')
+    log.info(f"Selected tiles {selected_tiles} from {raster}")
 
     # Find the gaussian threshold
     with np.testing.suppress_warnings() as sup:
-        sup.filter(RuntimeWarning)  # invalid value and divide by zero encountered in log10
-        tiles = np.log10(tiles) + 30.  # linear power scale -> Gaussian scale optimized for thresholding
-    max_gaussian_threshold = max_db_threshold / 10. + 30.  # db -> Gaussian scale optimized for thresholding
+        sup.filter(
+            RuntimeWarning
+        )  # invalid value and divide by zero encountered in log10
+        tiles = (
+            np.log10(tiles) + 30.0
+        )  # linear power scale -> Gaussian scale optimized for thresholding
+    max_gaussian_threshold = (
+        max_db_threshold / 10.0 + 30.0
+    )  # db -> Gaussian scale optimized for thresholding
     if selected_tiles.size:
         scaling = 256 / (np.mean(tiles) + 3 * np.std(tiles))
-        gaussian_threshold = determine_em_threshold(tiles[selected_tiles, :, :], scaling)
-        threshold_db = 10. * (gaussian_threshold - 30.)
-        log.info(f'Threshold determined to be {threshold_db} db')
+        gaussian_threshold = determine_em_threshold(
+            tiles[selected_tiles, :, :], scaling
+        )
+        threshold_db = 10.0 * (gaussian_threshold - 30.0)
+        log.info(f"Threshold determined to be {threshold_db} db")
         if gaussian_threshold > max_gaussian_threshold:
-            log.warning(f'Threshold too high! Using maximum threshold {max_db_threshold} db')
+            log.warning(
+                f"Threshold too high! Using maximum threshold {max_db_threshold} db"
+            )
             gaussian_threshold = max_gaussian_threshold
     else:
-        log.warning(f'Tile selection did not converge! using default threshold {max_db_threshold} db')
+        log.warning(
+            f"Tile selection did not converge! using default threshold {max_db_threshold} db"
+        )
         gaussian_threshold = max_gaussian_threshold
 
     gaussian_array = untile_array(tiles, array.shape)
     return (gaussian_array, gaussian_threshold)
 
 
-def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh_raster: Union[str, Path],
-                   hand_raster: Optional[Union[str, Path]] = None, tile_shape: Tuple[int, int] = (100, 100),
-                   max_vv_threshold: float = -15.5, max_vh_threshold: float = -23.0,
-                   hand_threshold: float = 15., hand_fraction: float = 0.8, membership_threshold: float = 0.45):
+def make_water_map(
+    out_raster: Union[str, Path],
+    vv_raster: Union[str, Path],
+    vh_raster: Union[str, Path],
+    hand_raster: Optional[Union[str, Path]] = None,
+    tile_shape: Tuple[int, int] = (100, 100),
+    max_vv_threshold: float = -15.5,
+    max_vh_threshold: float = -23.0,
+    hand_threshold: float = 15.0,
+    hand_fraction: float = 0.8,
+    membership_threshold: float = 0.45,
+):
     """Creates a surface water extent map from a Sentinel-1 RTC product
 
     Create a surface water extent map from a dual-pol Sentinel-1 RTC product and
@@ -276,39 +335,38 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
     """
     # Confirm tile shape validity
     if tile_shape[0] % 2 or tile_shape[1] % 2:
-        raise ValueError(f'tile_shape {tile_shape} requires even values.')
+        raise ValueError(f"tile_shape {tile_shape} requires even values.")
 
     # gather some CRS-related info
-    info = gdal.Info(str(vh_raster), format='json')
-    out_transform = info['geoTransform']
+    info = gdal.Info(str(vh_raster), format="json")
+    out_transform = info["geoTransform"]
     out_epsg = get_epsg_code(info)
 
     # Step 1: Prepare HAND data #
     if hand_raster is None:
-        hand_raster = str(out_raster).replace('.tif', '_HAND.tif')
-        log.info(f'Extracting HAND data to: {hand_raster}')
+        hand_raster = str(out_raster).replace(".tif", "_HAND.tif")
+        log.info(f"Extracting HAND data to: {hand_raster}")
         prepare_hand_for_raster(hand_raster, vh_raster)
 
-    log.info(f'Determining HAND memberships from {hand_raster}')
+    log.info(f"Determining HAND memberships from {hand_raster}")
     hand_array = read_as_masked_array(hand_raster)
     hand_tiles = tile_array(hand_array, tile_shape=tile_shape, pad_value=np.nan)
 
     hand_candidates = select_hand_tiles(hand_tiles, hand_threshold, hand_fraction)
-    log.debug(f'Selected HAND tile candidates {hand_candidates}')
+    log.debug(f"Selected HAND tile candidates {hand_candidates}")
 
     nodata = np.iinfo(np.uint8).max
     water_extent_maps = []
-    for max_db_threshold, raster, pol in ((max_vh_threshold, vh_raster, 'VH'), (max_vv_threshold, vv_raster, 'VV')):
-        log.info(f'Creating initial {pol} water extent map from {raster}')
+    for max_db_threshold, raster, pol in (
+        (max_vh_threshold, vh_raster, "VH"),
+        (max_vv_threshold, vv_raster, "VV"),
+    ):
+        log.info(f"Creating initial {pol} water extent map from {raster}")
         array = read_as_masked_array(raster)
 
         # Step 2: Adaptive dynamic thresholding #
         gaussian_array, gaussian_threshold = adaptive_dynamic_thresholding(
-            raster,
-            array,
-            max_db_threshold,
-            tile_shape,
-            hand_candidates
+            raster, array, max_db_threshold, tile_shape, hand_candidates
         )
 
         # Step 3: Create intial flood map #
@@ -316,130 +374,207 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
         water_map &= ~array.mask
 
         padding_mask = array.mask
-        write_cog(str(out_raster).replace('.tif', f'_{pol}_initial.tif'),
-                  format_raster_data(water_map, padding_mask, nodata),
-                  transform=out_transform, epsg_code=out_epsg, dtype=gdal.GDT_Byte, nodata_value=nodata)
+        write_cog(
+            str(out_raster).replace(".tif", f"_{pol}_initial.tif"),
+            format_raster_data(water_map, padding_mask, nodata),
+            transform=out_transform,
+            epsg_code=out_epsg,
+            dtype=gdal.GDT_Byte,
+            nodata_value=nodata,
+        )
 
         # Step 4: Fuzzy logic refinement and combine VV and VH fuzzy water extents #
-        log.info(f'Refining initial {pol} water extent map using Fuzzy Logic')
+        log.info(f"Refining initial {pol} water extent map using Fuzzy Logic")
         array = np.ma.masked_where(~water_map, array)
-        gaussian_lower_limit = np.log10(np.ma.median(array)) + 30.
+        gaussian_lower_limit = np.log10(np.ma.median(array)) + 30.0
 
         water_map = fuzzy_refinement(
-            water_map, gaussian_array, hand_array, pixel_size=out_transform[1],
-            gaussian_thresholds=(gaussian_lower_limit, gaussian_threshold), membership_threshold=membership_threshold
+            water_map,
+            gaussian_array,
+            hand_array,
+            pixel_size=out_transform[1],
+            gaussian_thresholds=(gaussian_lower_limit, gaussian_threshold),
+            membership_threshold=membership_threshold,
         )
         water_map &= ~array.mask
 
-        write_cog(str(out_raster).replace('.tif', f'_{pol}_fuzzy.tif'),
-                  format_raster_data(water_map, padding_mask, nodata),
-                  transform=out_transform, epsg_code=out_epsg, dtype=gdal.GDT_Byte, nodata_value=nodata)
+        write_cog(
+            str(out_raster).replace(".tif", f"_{pol}_fuzzy.tif"),
+            format_raster_data(water_map, padding_mask, nodata),
+            transform=out_transform,
+            epsg_code=out_epsg,
+            dtype=gdal.GDT_Byte,
+            nodata_value=nodata,
+        )
 
         water_extent_maps.append(water_map)
 
-    log.info('Combining Fuzzy VH and VV extent map')
+    log.info("Combining Fuzzy VH and VV extent map")
     combined_water_map = np.logical_or(*water_extent_maps)
 
     combined_segments = measure.label(combined_water_map, connectivity=2)
     combined_water_map = remove_small_segments(combined_segments)
 
-    write_cog(out_raster, format_raster_data(combined_water_map, padding_mask, nodata), transform=out_transform,
-              epsg_code=out_epsg, dtype=gdal.GDT_Byte, nodata_value=nodata)
-
-
-def _get_cli(interface: Literal['hyp3', 'main']) -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    write_cog(
+        out_raster,
+        format_raster_data(combined_water_map, padding_mask, nodata),
+        transform=out_transform,
+        epsg_code=out_epsg,
+        dtype=gdal.GDT_Byte,
+        nodata_value=nodata,
     )
 
-    if interface == 'hyp3':
-        parser.add_argument('--bucket')
-        parser.add_argument('--bucket-prefix', default='')
-        parser.add_argument('--vv-raster',
-                            help='Sentinel-1 RTC GeoTIFF raster, in power scale, with VV polarization.')
-    elif interface == 'main':
-        parser.add_argument('out_raster', help='Water map GeoTIFF to create')
+
+def _get_cli(interface: Literal["hyp3", "main"]) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    if interface == "hyp3":
+        parser.add_argument("--bucket")
+        parser.add_argument("--bucket-prefix", default="")
+        parser.add_argument(
+            "--vv-raster",
+            help="Sentinel-1 RTC GeoTIFF raster, in power scale, with VV polarization.",
+        )
+    elif interface == "main":
+        parser.add_argument("out_raster", help="Water map GeoTIFF to create")
         # FIXME: Decibel RTCs would be real nice.
-        parser.add_argument('vv_raster',
-                            help='Sentinel-1 RTC GeoTIFF raster, in power scale, with VV polarization')
-        parser.add_argument('vh_raster',
-                            help='Sentinel-1 RTC GeoTIFF raster, in power scale, with VH polarization')
+        parser.add_argument(
+            "vv_raster",
+            help="Sentinel-1 RTC GeoTIFF raster, in power scale, with VV polarization",
+        )
+        parser.add_argument(
+            "vh_raster",
+            help="Sentinel-1 RTC GeoTIFF raster, in power scale, with VH polarization",
+        )
 
-        parser.add_argument('--hand-raster',
-                            help='Height Above Nearest Drainage (HAND) GeoTIFF aligned to the RTC rasters. '
-                                 'If not specified, HAND data will be extracted from the GLO-30 HAND.')
-        parser.add_argument('--tile-shape', type=int, nargs=2, default=(100, 100),
-                            help='image tiles will have this shape (height, width) in pixels')
+        parser.add_argument(
+            "--hand-raster",
+            help="Height Above Nearest Drainage (HAND) GeoTIFF aligned to the RTC rasters. "
+            "If not specified, HAND data will be extracted from the GLO-30 HAND.",
+        )
+        parser.add_argument(
+            "--tile-shape",
+            type=int,
+            nargs=2,
+            default=(100, 100),
+            help="image tiles will have this shape (height, width) in pixels",
+        )
     else:
-        raise NotImplementedError(f'Unknown interface: {interface}')
+        raise NotImplementedError(f"Unknown interface: {interface}")
 
-    parser.add_argument('--max-vv-threshold', type=float, default=-15.5,
-                        help='Maximum threshold value to use for `vv_raster` in decibels (db)')
-    parser.add_argument('--max-vh-threshold', type=float, default=-23.0,
-                        help='Maximum threshold value to use for `vh_raster` in decibels (db)')
-    parser.add_argument('--hand-threshold', type=float, default=15.,
-                        help='The maximum height above nearest drainage in meters to consider a pixel valid')
-    parser.add_argument('--hand-fraction', type=float, default=0.8,
-                        help='The minimum fraction of valid HAND pixels required in a tile for thresholding')
-    parser.add_argument('--membership-threshold', type=float, default=0.45,
-                        help='The average membership to the fuzzy indicators required for a water pixel')
+    parser.add_argument(
+        "--max-vv-threshold",
+        type=float,
+        default=-15.5,
+        help="Maximum threshold value to use for `vv_raster` in decibels (db)",
+    )
+    parser.add_argument(
+        "--max-vh-threshold",
+        type=float,
+        default=-23.0,
+        help="Maximum threshold value to use for `vh_raster` in decibels (db)",
+    )
+    parser.add_argument(
+        "--hand-threshold",
+        type=float,
+        default=15.0,
+        help="The maximum height above nearest drainage in meters to consider a pixel valid",
+    )
+    parser.add_argument(
+        "--hand-fraction",
+        type=float,
+        default=0.8,
+        help="The minimum fraction of valid HAND pixels required in a tile for thresholding",
+    )
+    parser.add_argument(
+        "--membership-threshold",
+        type=float,
+        default=0.45,
+        help="The average membership to the fuzzy indicators required for a water pixel",
+    )
 
-    parser.add_argument('-v', '--verbose', action='store_true', help='Turn on verbose logging')
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Turn on verbose logging"
+    )
 
     return parser
 
 
 def hyp3():
-    parser = _get_cli(interface='hyp3')
+    parser = _get_cli(interface="hyp3")
     args = parser.parse_args()
 
     level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(stream=sys.stdout, format='%(asctime)s - %(levelname)s - %(message)s', level=level)
-    log.debug(' '.join(sys.argv))
+    logging.basicConfig(
+        stream=sys.stdout,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        level=level,
+    )
+    log.debug(" ".join(sys.argv))
 
     if args.vv_raster:
         vv_raster = args.vv_raster
     elif args.bucket:
-        vv_raster = get_path_to_s3_file(args.bucket, args.bucket_prefix, '_VV.tif')
-        log.info(f'Found VV raster: {vv_raster}')
+        vv_raster = get_path_to_s3_file(args.bucket, args.bucket_prefix, "_VV.tif")
+        log.info(f"Found VV raster: {vv_raster}")
     else:
-        raise ValueError('Arguments --vv-raster or --bucket must be provided.')
+        raise ValueError("Arguments --vv-raster or --bucket must be provided.")
 
-    vh_raster = vv_raster.replace('_VV.tif', '_VH.tif')
+    vh_raster = vv_raster.replace("_VV.tif", "_VH.tif")
 
-    product_name = Path(vv_raster).name.replace('_VV.tif', '_WM')
+    product_name = Path(vv_raster).name.replace("_VV.tif", "_WM")
     product_dir = Path.cwd() / product_name
     product_dir.mkdir(exist_ok=True)
 
-    water_map_raster = product_dir / f'{product_name}.tif'
+    water_map_raster = product_dir / f"{product_name}.tif"
 
     make_water_map(
-        out_raster=water_map_raster, vv_raster=vv_raster, vh_raster=vh_raster,
-        max_vv_threshold=args.max_vv_threshold, max_vh_threshold=args.max_vh_threshold,
-        hand_threshold=args.hand_threshold, hand_fraction=args.hand_fraction,
-        membership_threshold=args.membership_threshold
+        out_raster=water_map_raster,
+        vv_raster=vv_raster,
+        vh_raster=vh_raster,
+        max_vv_threshold=args.max_vv_threshold,
+        max_vh_threshold=args.max_vh_threshold,
+        hand_threshold=args.hand_threshold,
+        hand_fraction=args.hand_fraction,
+        membership_threshold=args.membership_threshold,
     )
 
-    log.info(f'Water map created successfully: {water_map_raster}')
+    log.info(f"Water map created successfully: {water_map_raster}")
 
     if args.bucket:
-        output_zip = make_archive(base_name=product_name, format='zip', base_dir=product_name)
+        output_zip = make_archive(
+            base_name=product_name, format="zip", base_dir=product_name
+        )
         upload_file_to_s3(Path(output_zip), args.bucket, args.bucket_prefix)
         for product_file in product_dir.iterdir():
             upload_file_to_s3(product_file, args.bucket, args.bucket_prefix)
 
 
 def main():
-    parser = _get_cli(interface='main')
+    parser = _get_cli(interface="main")
     args = parser.parse_args()
 
     level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(stream=sys.stdout, format='%(asctime)s - %(levelname)s - %(message)s', level=level)
-    log.debug(' '.join(sys.argv))
+    logging.basicConfig(
+        stream=sys.stdout,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        level=level,
+    )
+    log.debug(" ".join(sys.argv))
 
-    make_water_map(args.out_raster, args.vv_raster, args.vh_raster, args.hand_raster, args.tile_shape,
-                   args.max_vv_threshold, args.max_vh_threshold, args.hand_threshold, args.hand_fraction,
-                   args.membership_threshold)
+    make_water_map(
+        args.out_raster,
+        args.vv_raster,
+        args.vh_raster,
+        args.hand_raster,
+        args.tile_shape,
+        args.max_vv_threshold,
+        args.max_vh_threshold,
+        args.hand_threshold,
+        args.hand_fraction,
+        args.membership_threshold,
+    )
 
-    log.info(f'Water map created successfully: {args.out_raster}')
+    log.info(f"Water map created successfully: {args.out_raster}")
