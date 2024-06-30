@@ -8,9 +8,10 @@ Maximization thresholding approach and refined using Fuzzy Logic.
 
 import argparse
 import logging
-import sys
+import os
 from pathlib import Path
 from shutil import make_archive
+import sys
 from typing import Literal, Optional, Tuple, Union
 
 import numpy as np
@@ -52,8 +53,19 @@ def select_hand_tiles(tiles: Union[np.ndarray, np.ma.MaskedArray],
 
 
 def select_backscatter_tiles(backscatter_tiles: np.ndarray, hand_candidates: np.ndarray) -> np.ndarray:
-    tile_indexes = np.arange(backscatter_tiles.shape[0])
+    """
+    Select 5 tiles whose:
+        - median is below the median of tile medians
+        - has a corresponding HAND candidate
+        - is accompanied by 4 other tiles, all of whose variances lie above the highest possible variance percentile,  
+          starting at the 95th and working backwards in 5% increments
+          - if 5 tiles are not found with variences > 95th percentile, we try the 90th, 85th, etc...
 
+    Args:
+        backscatter_tiles: 
+    """
+    tile_indexes = np.arange(backscatter_tiles.shape[0])
+    
     sub_tile_means = mean_of_subtiles(backscatter_tiles)
     sub_tile_means_std = sub_tile_means.std(axis=1)
     tile_medians = np.ma.median(backscatter_tiles, axis=(1, 2))
@@ -61,9 +73,10 @@ def select_backscatter_tiles(backscatter_tiles: np.ndarray, hand_candidates: np.
 
     low_mean_threshold = np.ma.median(tile_medians[hand_candidates])
     low_mean_candidates = tile_indexes[tile_medians < low_mean_threshold]
-
+    
     potential_candidates = np.intersect1d(hand_candidates, low_mean_candidates)
 
+    # iterate across 5 percentile increments of tile_varience in reverse order
     for variance_threshold in np.nanpercentile(tile_variance.filled(np.nan), np.arange(5, 96)[::-1]):
         variance_candidates = tile_indexes[tile_variance > variance_threshold]
         selected = np.intersect1d(variance_candidates, potential_candidates)
@@ -171,6 +184,40 @@ def fuzzy_refinement(initial_map: np.ndarray, gaussian_array: np.ndarray, hand_a
     return water_map
 
 
+def adaptive_dynamic_thresholding(
+    raster: Union[str, os.PathLike], 
+    array: np.ma.MaskedArray,
+    max_db_threshold: float,
+    tile_shape: Tuple[int, int],
+    hand_candidates: np.ndarray
+) -> Tuple[np.ma.MaskedArray, float]:
+    tiles = tile_array(array, tile_shape=tile_shape, pad_value=0.)
+    # Masking less than zero only necessary for old HyP3/GAMMA products which sometimes returned negative powers
+    tiles = np.ma.masked_less_equal(tiles, 0.)
+    selected_tiles = select_backscatter_tiles(tiles, hand_candidates)
+    log.info(f'Selected tiles {selected_tiles} from {raster}')
+
+    # Find the gaussian threshold
+    with np.testing.suppress_warnings() as sup:
+        sup.filter(RuntimeWarning)  # invalid value and divide by zero encountered in log10
+        tiles = np.log10(tiles) + 30.  # linear power scale -> Gaussian scale optimized for thresholding
+    max_gaussian_threshold = max_db_threshold / 10. + 30.  # db -> Gaussian scale optimized for thresholding
+    if selected_tiles.size:
+        scaling = 256 / (np.mean(tiles) + 3 * np.std(tiles))
+        gaussian_threshold = determine_em_threshold(tiles[selected_tiles, :, :], scaling)
+        threshold_db = 10. * (gaussian_threshold - 30.)
+        log.info(f'Threshold determined to be {threshold_db} db')
+        if gaussian_threshold > max_gaussian_threshold:
+            log.warning(f'Threshold too high! Using maximum threshold {max_db_threshold} db')
+            gaussian_threshold = max_gaussian_threshold
+    else:
+        log.warning(f'Tile selection did not converge! using default threshold {max_db_threshold} db')
+        gaussian_threshold = max_gaussian_threshold
+
+    gaussian_array = untile_array(tiles, array.shape)
+    return (gaussian_array, gaussian_threshold)
+
+
 def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh_raster: Union[str, Path],
                    hand_raster: Optional[Union[str, Path]] = None, tile_shape: Tuple[int, int] = (100, 100),
                    max_vv_threshold: float = -15.5, max_vh_threshold: float = -23.0,
@@ -230,14 +277,16 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
             thresholding
         membership_threshold: The average membership to the fuzzy indicators required for a water pixel
     """
+    # Confirm tile shape validity
     if tile_shape[0] % 2 or tile_shape[1] % 2:
         raise ValueError(f'tile_shape {tile_shape} requires even values.')
 
+    # gather some CRS-related info
     info = gdal.Info(str(vh_raster), format='json')
-
     out_transform = info['geoTransform']
     out_epsg = get_epsg_code(info)
 
+    #### Step 1: Prepare HAND data ####
     if hand_raster is None:
         hand_raster = str(out_raster).replace('.tif', '_HAND.tif')
         log.info(f'Extracting HAND data to: {hand_raster}')
@@ -246,48 +295,35 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
     log.info(f'Determining HAND memberships from {hand_raster}')
     hand_array = read_as_masked_array(hand_raster)
     hand_tiles = tile_array(hand_array, tile_shape=tile_shape, pad_value=np.nan)
-
+    
     hand_candidates = select_hand_tiles(hand_tiles, hand_threshold, hand_fraction)
     log.debug(f'Selected HAND tile candidates {hand_candidates}')
 
-    selected_tiles = None
     nodata = np.iinfo(np.uint8).max
     water_extent_maps = []
     for max_db_threshold, raster, pol in ((max_vh_threshold, vh_raster, 'VH'), (max_vv_threshold, vv_raster, 'VV')):
         log.info(f'Creating initial {pol} water extent map from {raster}')
         array = read_as_masked_array(raster)
-        padding_mask = array.mask
-        tiles = tile_array(array, tile_shape=tile_shape, pad_value=0.)
-        # Masking less than zero only necessary for old HyP3/GAMMA products which sometimes returned negative powers
-        tiles = np.ma.masked_less_equal(tiles, 0.)
-        if selected_tiles is None:
-            selected_tiles = select_backscatter_tiles(tiles, hand_candidates)
-            log.info(f'Selected tiles {selected_tiles} from {raster}')
 
-        with np.testing.suppress_warnings() as sup:
-            sup.filter(RuntimeWarning)  # invalid value and divide by zero encountered in log10
-            tiles = np.log10(tiles) + 30.  # linear power scale -> Gaussian scale optimized for thresholding
-        max_gaussian_threshold = max_db_threshold / 10. + 30.  # db -> Gaussian scale optimized for thresholding
-        if selected_tiles.size:
-            scaling = 256 / (np.mean(tiles) + 3 * np.std(tiles))
-            gaussian_threshold = determine_em_threshold(tiles[selected_tiles, :, :], scaling)
-            threshold_db = 10. * (gaussian_threshold - 30.)
-            log.info(f'Threshold determined to be {threshold_db} db')
-            if gaussian_threshold > max_gaussian_threshold:
-                log.warning(f'Threshold too high! Using maximum threshold {max_db_threshold} db')
-                gaussian_threshold = max_gaussian_threshold
-        else:
-            log.warning(f'Tile selection did not converge! using default threshold {max_db_threshold} db')
-            gaussian_threshold = max_gaussian_threshold
+        #### Step 2: Adaptive dynamic thresholding ####
+        gaussian_array, gaussian_threshold = adaptive_dynamic_thresholding(
+            raster,
+            array,
+            max_db_threshold,
+            tile_shape,
+            hand_candidates
+        )
 
-        gaussian_array = untile_array(tiles, array.shape)
+        #### Step 3: Create intial flood map ####
         water_map = np.ma.masked_less_equal(gaussian_array, gaussian_threshold).mask
         water_map &= ~array.mask
 
+        padding_mask = array.mask
         write_cog(str(out_raster).replace('.tif', f'_{pol}_initial.tif'),
                   format_raster_data(water_map, padding_mask, nodata),
                   transform=out_transform, epsg_code=out_epsg, dtype=gdal.GDT_Byte, nodata_value=nodata)
 
+        #### Step 4: Fuzzy logic refinement and combine VV and VH fuzzy water extents ####
         log.info(f'Refining initial {pol} water extent map using Fuzzy Logic')
         array = np.ma.masked_where(~water_map, array)
         gaussian_lower_limit = np.log10(np.ma.median(array)) + 30.

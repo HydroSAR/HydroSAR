@@ -2,7 +2,7 @@ name: hydrosar
 channels: 
   - conda-forge
 dependencies:
-  # - python==3.11
+  - python==3.11 # scikit-fuzzy 0.4.2 imports imp, which is deprecated in Python 3.12 
   - affine
   - astropy
   - cdsapi
