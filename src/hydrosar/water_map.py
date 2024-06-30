@@ -10,8 +10,8 @@ import argparse
 import logging
 import os
 from pathlib import Path
-from shutil import make_archive
 import sys
+from shutil import make_archive
 from typing import Literal, Optional, Tuple, Union
 
 import numpy as np
@@ -60,12 +60,9 @@ def select_backscatter_tiles(backscatter_tiles: np.ndarray, hand_candidates: np.
         - is accompanied by 4 other tiles, all of whose variances lie above the highest possible variance percentile,  
           starting at the 95th and working backwards in 5% increments
           - if 5 tiles are not found with variences > 95th percentile, we try the 90th, 85th, etc...
-
-    Args:
-        backscatter_tiles: 
     """
     tile_indexes = np.arange(backscatter_tiles.shape[0])
-    
+
     sub_tile_means = mean_of_subtiles(backscatter_tiles)
     sub_tile_means_std = sub_tile_means.std(axis=1)
     tile_medians = np.ma.median(backscatter_tiles, axis=(1, 2))
@@ -73,7 +70,7 @@ def select_backscatter_tiles(backscatter_tiles: np.ndarray, hand_candidates: np.
 
     low_mean_threshold = np.ma.median(tile_medians[hand_candidates])
     low_mean_candidates = tile_indexes[tile_medians < low_mean_threshold]
-    
+
     potential_candidates = np.intersect1d(hand_candidates, low_mean_candidates)
 
     # iterate across 5 percentile increments of tile_varience in reverse order
@@ -286,7 +283,7 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
     out_transform = info['geoTransform']
     out_epsg = get_epsg_code(info)
 
-    #### Step 1: Prepare HAND data ####
+    # Step 1: Prepare HAND data #
     if hand_raster is None:
         hand_raster = str(out_raster).replace('.tif', '_HAND.tif')
         log.info(f'Extracting HAND data to: {hand_raster}')
@@ -295,7 +292,7 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
     log.info(f'Determining HAND memberships from {hand_raster}')
     hand_array = read_as_masked_array(hand_raster)
     hand_tiles = tile_array(hand_array, tile_shape=tile_shape, pad_value=np.nan)
-    
+
     hand_candidates = select_hand_tiles(hand_tiles, hand_threshold, hand_fraction)
     log.debug(f'Selected HAND tile candidates {hand_candidates}')
 
@@ -305,7 +302,7 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
         log.info(f'Creating initial {pol} water extent map from {raster}')
         array = read_as_masked_array(raster)
 
-        #### Step 2: Adaptive dynamic thresholding ####
+        # Step 2: Adaptive dynamic thresholding #
         gaussian_array, gaussian_threshold = adaptive_dynamic_thresholding(
             raster,
             array,
@@ -314,7 +311,7 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
             hand_candidates
         )
 
-        #### Step 3: Create intial flood map ####
+        # Step 3: Create intial flood map #
         water_map = np.ma.masked_less_equal(gaussian_array, gaussian_threshold).mask
         water_map &= ~array.mask
 
@@ -323,7 +320,7 @@ def make_water_map(out_raster: Union[str, Path], vv_raster: Union[str, Path], vh
                   format_raster_data(water_map, padding_mask, nodata),
                   transform=out_transform, epsg_code=out_epsg, dtype=gdal.GDT_Byte, nodata_value=nodata)
 
-        #### Step 4: Fuzzy logic refinement and combine VV and VH fuzzy water extents ####
+        # Step 4: Fuzzy logic refinement and combine VV and VH fuzzy water extents #
         log.info(f'Refining initial {pol} water extent map using Fuzzy Logic')
         array = np.ma.masked_where(~water_map, array)
         gaussian_lower_limit = np.log10(np.ma.median(array)) + 30.
