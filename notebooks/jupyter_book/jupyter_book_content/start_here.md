@@ -47,3 +47,32 @@ See the [HydroSAR README](../../../README.md) for a complete list of algorithms,
 >1. ### Create Water Maps
 >
 >    - 
+
+---
+
+<div class="alert alert-info" style="display: flex; align-items: center; font-family: 'Times New Roman', Times, serif; background-color: #d1ecf1;">
+  <div style="display: flex; align-items: center; width: 5%;">
+    <a href="https://github.com/HydroSAR/HydroSAR/issues">
+      <img src="https://opensarlab-docs.asf.alaska.edu/opensarlab-notebook-assets/logos/github_issues.png" alt="GitHub logo over the word Issues" style="width: 100px;">
+    </a>
+  </div>
+  <div style="width: 95%;">
+    <b>Did you find a bug? Do you have a feature request? Do you have questions about HydroSAR?</b>
+    <br/>
+    Explore GitHub Issues on this Jupyter Book's GitHub repository. Find solutions, add to the discussion, or start a new bug report or feature request: <a href="https://github.com/HydroSAR/HydroSAR/issues">HydroSAR Issues</a>
+  </div>
+</div>
+
+<div class="alert alert-info" style="display: flex; align-items: center; justify-content: space-between; font-family: 'Times New Roman', Times, serif; background-color: #d1ecf1;">
+  <div style="display: flex; align-items: center; margin-right: 10px; width: 5%;">
+    <a href="mailto:uso@asf.alaska.edu">
+      <img src="https://opensarlab-docs.asf.alaska.edu/opensarlab-notebook-assets/logos/ASF_support_logo.png" alt="ASF logo" style="width: 100px">
+    </a>
+  </div>
+  <div style="width: 95%;">
+    <b>Have a question related to SAR or ASF data access?</b>
+    <br/>
+    Contact ASF User Support: <a href="mailto:uso@asf.alaska.edu">uso@asf.alaska.edu</a>
+  </div>
+</div>
+
