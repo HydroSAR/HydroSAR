@@ -16,7 +16,7 @@ parts:
   - caption: HydroSAR
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Stack_Processing.ipynb
-      - file: notebooks/jupyter_book/jupyter_book_content/hydrosar-on-demand.ipynb
+      - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30-on-demand.ipynb
       - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Detailed_Walkthrough.ipynb
   - caption: Extras
     chapters:
