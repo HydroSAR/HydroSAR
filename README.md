@@ -32,6 +32,7 @@ The pipeline was made to work directly with ASF’s Vertex RTC images.
 The RTC tiffs and ERA5 precipitation data can be acquired by downloading them from an s3 bucket. This allows us to skip notebooks a1 and 1b (and projects in VERTEX timing out) and save some significant time. These instructions are meant for Franz, so he can work on the same dataset as Kas. 
 To access and copy from the s3 bucket:
 - aws s3 cp --recursive {folder to copy to} {location in s3 bucket}
+ 
 Locations in s3 Bucket
 - Northeastern river of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_NE/
 - Pair of adjacent watersheds in Nepal: s3://asf-jupyter-data-west/knicely/Nepal_sF/
