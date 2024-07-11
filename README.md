@@ -33,7 +33,7 @@ The RTC tiffs and ERA5 precipitation data can be acquired by downloading them fr
 - To access and copy from the s3 bucket
 -   aws s3 cp --recursive {folder to copy to} {location in s3 bucket}
 -   Locations in s3 Bucket
--     Northeastern river of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_NE/
+--     Northeastern river of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_NE/
 -     Pair of watersheds in Nepal: s3://asf-jupyter-data-west/knicely/Nepal_sF/
 -     Sylhet region of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_sylhet/
 - Example: To download 
