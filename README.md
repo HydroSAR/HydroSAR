@@ -28,6 +28,9 @@ The pipeline was made to work directly with ASF’s Vertex RTC images.
 ## Download the RTCs and precipitation data.
 - Launch Notebook a1. It might take some time to download all the RTC images. You can delete the zips but **do not delete the main RTCs once unzipped**.
 - Launch Notebook 1bis. This might take a few hours, depending on the queue of [Copernicus](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=overview) servers. *Once launched, let the notebook opened until you have a file in the ERA folder.* **You can run Notebooks 2 to 4 while waiting for Notebook 1bis to run**
+### RTCs for development
+The RTC tiffs can be acquired by downloading them from an s3 bucket. 
+- Instructions to get tiffs from s3 bucket
 
 ## Choose your AOI, generate its Water Masks. (The HAND DEM is now pulled from a repository)
 - Launch Notebook a2. Crop the RTCs to your AOI. Trial-and-error might have to happen in order to find an AOI that does not blow-up your RAM during the REOF (Notebook 5).
