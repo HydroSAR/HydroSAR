@@ -28,9 +28,15 @@ The pipeline was made to work directly with ASF’s Vertex RTC images.
 ## Download the RTCs and precipitation data.
 - Launch Notebook a1. It might take some time to download all the RTC images. You can delete the zips but **do not delete the main RTCs once unzipped**.
 - Launch Notebook 1bis. This might take a few hours, depending on the queue of [Copernicus](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=overview) servers. *Once launched, let the notebook opened until you have a file in the ERA folder.* **You can run Notebooks 2 to 4 while waiting for Notebook 1bis to run**
-### RTCs for development
-The RTC tiffs can be acquired by downloading them from an s3 bucket. 
-- Instructions to get tiffs from s3 bucket
+### Data for Development
+The RTC tiffs and ERA5 precipitation data can be acquired by downloading them from an s3 bucket. This allows us to skip notebooks a1 and 1b (and projects in VERTEX timing out) and save some significant time. These instructions are meant for Franz, so he can work on the same dataset as Kas. 
+- To access and copy from the s3 bucket
+-   aws s3 cp --recursive {folder to copy to} {location in s3 bucket}
+-   Locations in s3 Bucket
+-     Northeastern river of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_NE/
+-     Pair of watersheds in Nepal: s3://asf-jupyter-data-west/knicely/Nepal_sF/
+-     Sylhet region of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_sylhet/
+- Example: To download 
 
 ## Choose your AOI, generate its Water Masks. (The HAND DEM is now pulled from a repository)
 - Launch Notebook a2. Crop the RTCs to your AOI. Trial-and-error might have to happen in order to find an AOI that does not blow-up your RAM during the REOF (Notebook 5).
