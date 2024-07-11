@@ -32,13 +32,13 @@ The pipeline was made to work directly with ASF’s Vertex RTC images.
 The RTC tiffs and ERA5 precipitation data can be acquired by downloading them from an s3 bucket. This allows us to skip notebooks a1 and 1b (and projects in VERTEX timing out) and save some significant time. These instructions are meant for Franz, so he can work on the same dataset as Kas. 
 To access and copy from the s3 bucket:
 - aws s3 cp --recursive {folder to copy to} {location in s3 bucket}
-- Locations in s3 Bucket
-  - Northeastern river of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_NE/
-  - Pair of adjacent watersheds in Nepal: s3://asf-jupyter-data-west/knicely/Nepal_sF/
-  - Sylhet region of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_sylhet/
-  - Note:
-    - Each bucket contains a folder named 'RTC_GAMMA__tiffs'. These tiffs have been subsetted and are ready for Notebook a3 - Water masking.
-    - The Sylhet bucket contains both a folder named 'RTC_GAMMA__tiffs' and a zip file named 'sylhet_pre-subset.zip'. The zip file contains the original unmerged tiffs. This has been done due to issues with merging and subsetting the tiffs causing the water mask creation in Notebook a3 to fail to execute properly. 
+Locations in s3 Bucket
+- Northeastern river of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_NE/
+- Pair of adjacent watersheds in Nepal: s3://asf-jupyter-data-west/knicely/Nepal_sF/
+- Sylhet region of Bangladesh: s3://asf-jupyter-data-west/knicely/bang_sylhet/
+- Note:
+  - Each bucket contains a folder named 'RTC_GAMMA__tiffs'. These tiffs have been subsetted and are ready for Notebook a3 - Water masking.
+  - The Sylhet bucket contains both a folder named 'RTC_GAMMA__tiffs' and a zip file named 'sylhet_pre-subset.zip'. The zip file contains the original unmerged tiffs. This has been done due to issues with merging and subsetting the tiffs causing the water mask creation in Notebook a3 to fail to execute properly. 
 - Example: To download the subsetted tiffs of the northeastern river in Bangladesh from the s3 bucket into a folder named 'my_RTC_GAMMA__tiffs' would use the following command:
   -   aws s3 cp --recursive my_RTC_GAMMA__tiffs s3://asf-jupyter-data-west/knicely/bang_NE/RTC_GAMMA__tiffs
   - This will copy the contents of the s3 bucket ending in 'RTC_GAMMA__tiffs' into the folder in Open Science Lab named 'my_RTC_GAMMA__tiffs'
