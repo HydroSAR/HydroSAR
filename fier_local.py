@@ -496,7 +496,9 @@ def fits_to_files(fit_dict: dict,out_dir: str):
 
     return
 
-def find_fits(reof_ds: xr.Dataset, q_df: xr.DataArray, stack: xr.DataArray, train_size: float = 0.7, random_state: int = 0, ):
+
+
+def find_fits(reof_ds: xr.Dataset, q_df: xr.DataArray, stack: xr.DataArray, train_size: float = 0.7, random_state: int = 0):
     """Function to fit multiple polynomial curves on different temporal modes and test results
 
     """        
@@ -535,7 +537,8 @@ def find_fits(reof_ds: xr.Dataset, q_df: xr.DataArray, stack: xr.DataArray, trai
         y_train_mode = y_train.sel(mode=mode)
         y_test_mode = y_test.sel(mode=mode)
 
-        for order in range(1,4):
+        for order in range(1,max_degree+1): # max_degree+1 to make sure it includes max_degree; modification by Knicely
+        # for order in range(1,4): # original
 
             # apply polynomial fitting
             c = np.polyfit(X_train,y_train_mode,deg=order)
