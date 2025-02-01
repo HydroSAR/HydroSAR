@@ -18,6 +18,8 @@ classifiers=[
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "asf_tools>=0.6",
@@ -46,10 +48,7 @@ FD30 = "hydrosar.flood_map:hyp3"
 
 [project.optional-dependencies]
 develop = [
-    "flake8",
-    "flake8-import-order",
-    "flake8-blind-except",
-    "flake8-builtins",
+    "ruff",
     "gdal-utils",
     "pytest",
     "pytest-cov",
@@ -76,3 +75,32 @@ git_describe_command = ['git', 'describe', '--dirty', '--tags', '--long', '--mat
 markers = [
     "integration: long-running integration tests",
 ]
+
+[tool.ruff]
+line-length = 120
+# The directories to consider when resolving first- vs. third-party imports.
+# See: https://docs.astral.sh/ruff/settings/#src
+src = ["src", "tests"]
+# In addition to the standard set of exclusions, omit these
+extend-exclude = ["notebooks", "CCD30"]
+
+[tool.ruff.format]
+indent-style = "space"
+quote-style = "single"
+
+[tool.ruff.lint]
+extend-select = [
+    "I",   # isort: https://docs.astral.sh/ruff/rules/#isort-i
+    # TODO: Enable this as errors have been addressed
+    # "UP",  # pyupgrade: https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    # "D",   # pydocstyle: https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    # "ANN", # annotations: https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
+    # "PTH", # use-pathlib-pth: https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+lines-after-imports = 2
