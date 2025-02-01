@@ -17,6 +17,7 @@ from asf_tools.raster import write_cog
 from pysheds.sgrid import sGrid
 from shapely.geometry import GeometryCollection, shape
 
+
 log = logging.getLogger(__name__)
 
 

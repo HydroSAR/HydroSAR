@@ -10,6 +10,7 @@ from rasterio.enums import Resampling
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
+
 HAND_GEOJSON = '/vsicurl/https://glo-30-hand.s3.amazonaws.com/v1/2021/glo-30-hand.geojson'
 
 gdal.UseExceptions()
