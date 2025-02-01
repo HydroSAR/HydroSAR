@@ -21,7 +21,7 @@ def _make_histogram(image):
             histogram[0, floor_value] = histogram[0, floor_value] + temp1
             histogram[0, floor_value - 1] = histogram[0, floor_value - 1] + temp2
     histogram = np.convolve(histogram[0], [1, 2, 3, 2, 1])
-    histogram = histogram[2:(histogram.size - 3)]
+    histogram = histogram[2 : (histogram.size - 3)]
     histogram /= np.sum(histogram)
     return histogram
 
@@ -68,43 +68,26 @@ def expectation_maximization_threshold(tile: np.ndarray, number_of_classes: int 
     nonzero_indices = np.nonzero(histogram)[0]
     histogram = histogram[nonzero_indices]
     histogram = histogram.flatten()
-    class_means = (
-            (np.arange(number_of_classes) + 1) * maximum /
-            (number_of_classes + 1)
-    )
+    class_means = (np.arange(number_of_classes) + 1) * maximum / (number_of_classes + 1)
     class_variances = np.ones(number_of_classes) * maximum
     class_proportions = np.ones(number_of_classes) * 1 / number_of_classes
     sml = np.mean(np.diff(nonzero_indices)) / 1000
     iteration = 0
     while True:
-        class_likelihood = _make_distribution(
-            class_means, class_variances, class_proportions, nonzero_indices
-        )
-        sum_likelihood = np.sum(class_likelihood, 1) + np.finfo(
-            class_likelihood[0][0]).eps
+        class_likelihood = _make_distribution(class_means, class_variances, class_proportions, nonzero_indices)
+        sum_likelihood = np.sum(class_likelihood, 1) + np.finfo(class_likelihood[0][0]).eps
         log_likelihood = np.sum(histogram * np.log(sum_likelihood))
         for j in range(0, number_of_classes):
-            class_posterior_probability = (
-                    histogram * class_likelihood[:, j] / sum_likelihood
-            )
+            class_posterior_probability = histogram * class_likelihood[:, j] / sum_likelihood
             class_proportions[j] = np.sum(class_posterior_probability)
-            class_means[j] = (
-                    np.sum(nonzero_indices * class_posterior_probability)
-                    / class_proportions[j]
-            )
-            vr = (nonzero_indices - class_means[j])
-            class_variances[j] = (
-                    np.sum(vr * vr * class_posterior_probability)
-                    / class_proportions[j] + sml
-            )
+            class_means[j] = np.sum(nonzero_indices * class_posterior_probability) / class_proportions[j]
+            vr = nonzero_indices - class_means[j]
+            class_variances[j] = np.sum(vr * vr * class_posterior_probability) / class_proportions[j] + sml
             del class_posterior_probability, vr
         class_proportions += 1e-3
         class_proportions /= np.sum(class_proportions)
-        class_likelihood = _make_distribution(
-            class_means, class_variances, class_proportions, nonzero_indices
-        )
-        sum_likelihood = np.sum(class_likelihood, 1) + np.finfo(
-            class_likelihood[0, 0]).eps
+        class_likelihood = _make_distribution(class_means, class_variances, class_proportions, nonzero_indices)
+        sum_likelihood = np.sum(class_likelihood, 1) + np.finfo(class_likelihood[0, 0]).eps
         del class_likelihood
         new_log_likelihood = np.sum(histogram * np.log(sum_likelihood))
         del sum_likelihood
@@ -125,15 +108,12 @@ def expectation_maximization_threshold(tile: np.ndarray, number_of_classes: int 
             else:
                 posterior_lookup.update({pixel_val: [0] * number_of_classes})
                 for n in range(0, number_of_classes):
-                    x = _make_distribution(
-                        class_means[n], class_variances[n], class_proportions[n],
-                        image_copy[i, j]
-                    )
+                    x = _make_distribution(class_means[n], class_variances[n], class_proportions[n], image_copy[i, j])
                     posterior[i, j, n] = x * class_proportions[n]
                     posterior_lookup[pixel_val][n] = posterior[i, j, n]
 
     sorti = np.argsort(class_means)
-    xvec = np.arange(class_means[sorti[0]], class_means[sorti[1]], step=.05)
+    xvec = np.arange(class_means[sorti[0]], class_means[sorti[1]], step=0.05)
     x1 = _make_distribution(class_means[sorti[0]], class_variances[sorti[0]], class_proportions[sorti[0]], xvec)
     x2 = _make_distribution(class_means[sorti[1]], class_variances[sorti[1]], class_proportions[sorti[1]], xvec)
     dx = np.abs(x1 - x2)
