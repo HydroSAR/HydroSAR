@@ -1,4 +1,5 @@
 """Calculate Height Above Nearest Drainage (HAND) from the Copernicus GLO-30 DEM"""
+
 import argparse
 import logging
 import sys
@@ -29,11 +30,9 @@ def fill_nan(array: np.ndarray) -> np.ndarray:
     """
     kernel = astropy.convolution.Gaussian2DKernel(x_stddev=3)  # kernel x_size=8*stddev
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+        warnings.simplefilter('ignore')
         while np.any(np.isnan(array)):
-            array = astropy.convolution.interpolate_replace_nans(
-                array, kernel, convolve=astropy.convolution.convolve
-            )
+            array = astropy.convolution.interpolate_replace_nans(array, kernel, convolve=astropy.convolution.convolve)
 
     return array
 
@@ -55,8 +54,9 @@ def fill_hand(hand: np.ndarray, dem: np.ndarray):
     return hand
 
 
-def calculate_hand(dem_array, dem_affine: rasterio.Affine, dem_crs: rasterio.crs.CRS, basin_mask,
-                   acc_thresh: Optional[int] = 100):
+def calculate_hand(
+    dem_array, dem_affine: rasterio.Affine, dem_crs: rasterio.crs.CRS, basin_mask, acc_thresh: Optional[int] = 100
+):
     """Calculate the Height Above Nearest Drainage (HAND)
 
      Calculate the Height Above Nearest Drainage (HAND) using pySHEDS library. Because HAND
@@ -88,10 +88,14 @@ def calculate_hand(dem_array, dem_affine: rasterio.Affine, dem_crs: rasterio.crs
     """
     nodata_fill_value = np.finfo(float).eps
     with NamedTemporaryFile() as temp_file:
-        write_cog(temp_file.name, dem_array,
-                  transform=dem_affine.to_gdal(), epsg_code=dem_crs.to_epsg(),
-                  # Prevents PySheds from assuming using zero as the nodata value
-                  nodata_value=nodata_fill_value)
+        write_cog(
+            temp_file.name,
+            dem_array,
+            transform=dem_affine.to_gdal(),
+            epsg_code=dem_crs.to_epsg(),
+            # Prevents PySheds from assuming using zero as the nodata value
+            nodata_value=nodata_fill_value,
+        )
 
         # From PySheds; see example usage: http://mattbartos.com/pysheds/
         grid = sGrid.from_raster(str(temp_file.name))
@@ -134,8 +138,12 @@ def calculate_hand(dem_array, dem_affine: rasterio.Affine, dem_crs: rasterio.crs
     return hand
 
 
-def calculate_hand_for_basins(out_raster:  Union[str, Path], geometries: GeometryCollection,
-                              dem_file: Union[str, Path], acc_thresh: Optional[int] = 100):
+def calculate_hand_for_basins(
+    out_raster: Union[str, Path],
+    geometries: GeometryCollection,
+    dem_file: Union[str, Path],
+    acc_thresh: Optional[int] = 100,
+):
     """Calculate the Height Above Nearest Drainage (HAND) for watershed boundaries (hydrobasins).
 
     For watershed boundaries, see: https://www.hydrosheds.org/page/hydrobasins
@@ -156,11 +164,15 @@ def calculate_hand_for_basins(out_raster:  Union[str, Path], geometries: Geometr
         hand = calculate_hand(basin_array, basin_affine_tf, src.crs, basin_mask, acc_thresh=acc_thresh)
 
         write_cog(
-            out_raster, hand, transform=basin_affine_tf.to_gdal(), epsg_code=src.crs.to_epsg(), nodata_value=np.nan,
+            out_raster,
+            hand,
+            transform=basin_affine_tf.to_gdal(),
+            epsg_code=src.crs.to_epsg(),
+            nodata_value=np.nan,
         )
 
 
-def make_copernicus_hand(out_raster:  Union[str, Path], vector_file: Union[str, Path], acc_thresh: Optional[int] = 100):
+def make_copernicus_hand(out_raster: Union[str, Path], vector_file: Union[str, Path], acc_thresh: Optional[int] = 100):
     """Copernicus GLO-30 Height Above Nearest Drainage (HAND)
 
     Make a Height Above Nearest Drainage (HAND) GeoTIFF from the Copernicus GLO-30 DEM
@@ -195,12 +207,19 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('out_raster', help='HAND GeoTIFF to create')
-    parser.add_argument('vector_file', help='Vector file of watershed boundary (hydrobasin) polygons to calculate HAND '
-                                            'over. Vector file Must be openable by GDAL, see: '
-                                            'https://gdal.org/drivers/vector/index.html')
-    parser.add_argument('-a', '--acc-threshold', type=none_or_int, default=100,
-                        help='Accumulation threshold for determining the drainage mask. '
-                             'If `None`, the mean accumulation value is used')
+    parser.add_argument(
+        'vector_file',
+        help='Vector file of watershed boundary (hydrobasin) polygons to calculate HAND '
+        'over. Vector file Must be openable by GDAL, see: '
+        'https://gdal.org/drivers/vector/index.html',
+    )
+    parser.add_argument(
+        '-a',
+        '--acc-threshold',
+        type=none_or_int,
+        default=100,
+        help='Accumulation threshold for determining the drainage mask. If `None`, the mean accumulation value is used',
+    )
 
     parser.add_argument('-v', '--verbose', action='store_true', help='Turn on verbose logging')
     args = parser.parse_args()

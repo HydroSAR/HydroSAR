@@ -5,14 +5,13 @@ import pytest
 
 
 def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "integration: marks tests as integration"
-    )
+    config.addinivalue_line('markers', 'integration: marks tests as integration')
 
 
 def pytest_addoption(parser):
-    parser.addoption('--integration', action='store_true', default=False, dest='integration',
-                     help='enable integration tests')
+    parser.addoption(
+        '--integration', action='store_true', default=False, dest='integration', help='enable integration tests'
+    )
 
 
 def pytest_collection_modifyitems(config, items):
