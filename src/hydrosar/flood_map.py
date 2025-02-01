@@ -25,6 +25,7 @@ from osgeo import gdal
 from scipy import ndimage, optimize, stats
 from tqdm import tqdm
 
+
 log = logging.getLogger(__name__)
 
 

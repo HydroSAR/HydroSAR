@@ -25,6 +25,7 @@ from skimage import measure
 from hydrosar.hand.prepare import prepare_hand_for_raster
 from hydrosar.threshold import expectation_maximization_threshold as em_threshold
 
+
 log = logging.getLogger(__name__)
 
 
