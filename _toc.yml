@@ -8,16 +8,15 @@ parts:
   - caption: Set Up
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/Software_Environments.ipynb
-      # - file: docs/Jupyter_Book/Jupyter_Book_Content/CDS_Access.ipynb
+      - file: notebooks/jupyter_book/jupyter_book_content/CDS_Access.ipynb
   - caption: Data Access
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/Prepare_HydroSAR_RTC_Stack
-      # - file: docs/Jupyter_Book/Jupyter_Book_Content/ERA5_Download.ipynb
+      - file: notebooks/jupyter_book/jupyter_book_content/ERA5_Download.ipynb
   - caption: HydroSAR
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Stack_Processing.ipynb
       - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30-on-demand.ipynb
-      - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Detailed_Walkthrough.ipynb
   - caption: Extras
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/Subset_HydroSAR_Stack.ipynb

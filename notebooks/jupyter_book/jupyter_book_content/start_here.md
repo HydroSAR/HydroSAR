@@ -1,4 +1,12 @@
 # Start Here
+---
+
+## HydroSAR
+
+<div>
+<img style= "padding: 7px" src="https://avatars.githubusercontent.com/u/154390829?s=200&v=4"/>
+<img style= "padding: 7px" src="https://www.nasa.gov/wp-content/uploads/2023/04/nasa-logo-web-rgb.png" width="250px"/>
+</div>
 
 HydroSAR is a project funded by the NASA Applied Sciences Program focused on the development of algorithms for the monitoring of hydrological hazards using data from Synthetic Aperture Radar (SAR) sensors. This Jupyter Book demonstrates how to create HydroSAR products. 
 
@@ -7,72 +15,72 @@ This Jupyter Book currently supports:
 
 See the [HydroSAR README](../../../README.md) for a complete list of algorithms, still under development.
 
-
-<div class="alert alert-success" style="display: flex; align-items: center; font-family: 'Times New Roman', Times, serif; background-color: 'rgba(200,0,0,0.2)'">
-  <div style="width: 95%;">
-    <h2><b>Important Note About Your Jupyter Environment if not in OpenSARLab</b></h2>
-    <b><i>Tip: Run the notebooks in this Jupyter Book from Jupyter Lab, launched from a conda environment containing the required Jupyter packages. 
-        <br/>
-        This can be accomplished with the following commands:</i></b>
-    <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 5px; border: 1px solid #ccc; overflow: auto;">
-      <code>mamba create -n jbook -c conda-forge jupyterlab notebook ipywidgets ipympl nb_conda_kernels</code>
-      <code>mamba activate jbook</code>
-      <code>python -m pip install jupyterlab-jupyterbook-navigation</code>
-      <code>jupyter lab</code>
-    </pre>
-    <ul>
-        <li>Jupyter selection widgets used in the notebooks require the packages <code>ipywidgets</code> and <code>notebook</code>.</li>
-        <li>In order to use multiple conda environments in Jupyter Lab at the same time, you must install <code>nb_conda_kernels</code>.</li>
-        <li>Interactive matplotlib plots requires the package <code>ipympl</code> in the environment running Jupyter Lab</li>
-    </ul>
-  </div>
-</div>
+---
 
 ## How To Use This Jupyter Book
 
->1. ### Install the software environments needed to run the notebooks
->
->    - [Install Required Software with Conda](Software_Environments.ipynb)
->    - Rerun this step periodically to pull in environment updates.
->
->1. ### Access and Prepare RTCs for HydroSAR
->
->    - Not necessary if ordering water maps directly from ASF HyP3
->    - [Download RTCs from ASF HyP3](Prepare_HydroSAR_RTC_Stack.ipynb)
->  
->1. ### Subset Data (Optional)
->
->    - [Subset RTCs](Subset_HydroSAR_Stack.ipynb)
->  
->1. ### Create Water Maps
->
->    - 
+### 1. Provision the software environment needed to run the notebooks
+
+#### If Inside of OpenSARLab:
+  1. Clone the [HydroSAR repository](https://github.com/HydroSAR/HydroSAR.git) to your storage volume
+  2. Run the [Software_Environments notebook](./Software_Environments.ipynb) to install the required software with Conda
+     - Rerun the notebook periodically to pull in environment updates.
+<br><br>
+
+#### If Outside of OpenSARLab:
+
+**Option 1: Run a prepared HydroSAR image in a Docker container on your computer:**
+1. (Prerequisite) [Docker](https://docs.docker.com/get-started/get-docker/) should be installed, and the Docker engine running 
+1. Clone the [HydroSAR repository](https://github.com/HydroSAR/HydroSAR.git) to your hard drive
+
+     `git clone https://github.com/HydroSAR/HydroSAR.git`
+
+1. Use the following command to run the `hydrosar-jupyter` Docker image on your computer and work with JupyterLab in a browser
+
+    `docker run --rm --init -v <path/to/hydrosar_repo>:/home/jovyan:rw -p 8888:8888 ghcr.io/hydrosar/hydrosar-jupyter:test`
+
+   *Note: If port 8888 is already in use, you can select a different port for Jupyter by changing `8888:8888` in the above command to `8889:8888` (or another port if 8889 is also unavailable)*
+   
+1. Open one of the URLs provided when the jupyter server starts
+
+   *Note: The Jupyter-provided urls may use port 8888 regardless of launching from a different port in the `docker run` command. If this happens and JupyterLab fails to load, you can manually update the port in the url to match the one you used.*
+ 
+![](assets/jupyter_url.png)
+*Open one of the Jupyter-provided URLs to access your local server. Update the port number from 8888 if necessary.*
+<br><br>
+
+**Option 2: Run the image in a JupyterHub that accepts user provided images**
+1. If you have access to a JupyterHub with [repo2docker](https://github.com/jupyterhub/repo2docker) installed, there may be an option on the server startup page allowing you to provide the location of the `hydrosar-jupyter` image in the GitHub Container Registry: `ghcr.io/hydrosar/hydrosar-jupyter:test` 
+<br><br>
+
+**Option 3: Create a conda environment on your computer:**
+1. Clone the [HydroSAR repository](https://github.com/HydroSAR/HydroSAR.git) to your hard drive
+
+     `git clone https://github.com/HydroSAR/HydroSAR.git`
+
+1. Run the following commands to create the `hydrosar` conda environment, activate it, register its Python kernel with Jupyter, and launch JupyterLab
+
+   ```bash
+      mamba env create -f <path/to/hydrosar_repo>/notebooks/jupyter_book/jupyter_book_environment/hydrosar.yml
+      mamba activate hydrosar
+      python -m ipykernel install --name hydrosar
+      jupyter lab
+   ```
+ 
+ ---
+ 
+
+### 2. Access and Prepare RTCs for HydroSAR
+1. Run the [Prepare_HydroSAR_RTC_Stack notebook](Prepare_HydroSAR_RTC_Stack.ipynb) to access RTCs from ASF (HyP3 On-Demand or OPERA)
 
 ---
+### 3. Subset Data (Optional)
+1. Run the [Subset_HydroSAR_Stack notebook](Subset_HydroSAR_Stack.ipynb) to subset the RTCs to common bounds
 
-<div class="alert alert-info" style="display: flex; align-items: center; font-family: 'Times New Roman', Times, serif; background-color: #d1ecf1;">
-  <div style="display: flex; align-items: center; width: 5%;">
-    <a href="https://github.com/HydroSAR/HydroSAR/issues">
-      <img src="https://opensarlab-docs.asf.alaska.edu/opensarlab-notebook-assets/logos/github_issues.png" alt="GitHub logo over the word Issues" style="width: 100px;">
-    </a>
-  </div>
-  <div style="width: 95%;">
-    <b>Did you find a bug? Do you have a feature request? Do you have questions about HydroSAR?</b>
-    <br/>
-    Explore GitHub Issues on this Jupyter Book's GitHub repository. Find solutions, add to the discussion, or start a new bug report or feature request: <a href="https://github.com/HydroSAR/HydroSAR/issues">HydroSAR Issues</a>
-  </div>
-</div>
+---
+### 4. Create Water Maps
+1. Run the [HYDRO30_Stack_Processing notebook](HYDRO30_Stack_Processing.ipynb) to generate water extent maps from a prepared stack of RTCs with HydroSAR-HYDRO30
 
-<div class="alert alert-info" style="display: flex; align-items: center; justify-content: space-between; font-family: 'Times New Roman', Times, serif; background-color: #d1ecf1;">
-  <div style="display: flex; align-items: center; margin-right: 10px; width: 5%;">
-    <a href="mailto:uso@asf.alaska.edu">
-      <img src="https://opensarlab-docs.asf.alaska.edu/opensarlab-notebook-assets/logos/ASF_support_logo.png" alt="ASF logo" style="width: 100px">
-    </a>
-  </div>
-  <div style="width: 95%;">
-    <b>Have a question related to SAR or ASF data access?</b>
-    <br/>
-    Contact ASF User Support: <a href="mailto:uso@asf.alaska.edu">uso@asf.alaska.edu</a>
-  </div>
-</div>
+
+
 
