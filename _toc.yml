@@ -13,7 +13,7 @@ parts:
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/Prepare_HydroSAR_RTC_Stack
       - file: notebooks/jupyter_book/jupyter_book_content/ERA5_Download.ipynb
-  - caption: HydroSAR
+  - caption: HYDRO30
     chapters:
       - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30_Stack_Processing.ipynb
       - file: notebooks/jupyter_book/jupyter_book_content/HYDRO30-on-demand.ipynb
