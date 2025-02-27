@@ -277,6 +277,7 @@ def make_water_map(
         array = read_as_masked_array(raster)
 
         # OPERA data returns invalid mask so regenrate it
+        # We can hopefully remove this after resolving https://github.com/ASFHyP3/asf-tools/issues/270
         if array.mask is np.ma.nomask:
             array = np.ma.masked_invalid(array)
 
