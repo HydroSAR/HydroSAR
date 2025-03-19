@@ -18,7 +18,7 @@ dependencies:
   - ipympl
   - jupyterlab
   - matplotlib
-  - numpy  
+  - numpy<2  
   - opensarlab_lib
   - pandas
   - pip
