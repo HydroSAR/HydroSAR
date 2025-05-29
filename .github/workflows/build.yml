@@ -1,28 +1,30 @@
-name: Test and build
+name: Build
 
 on:
   push:
     branches:
-      - main
       - develop
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
       - develop
 
 jobs:
-  call-pytest-workflow:
-    uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@v0.20.0
-    with:
-      local_package_name: hydrosar
-
   call-version-info-workflow:
     uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.20.0
+    permissions:
+      contents: read
 
   call-docker-ghcr-workflow:
     needs: call-version-info-workflow
     uses: ASFHyP3/actions/.github/workflows/reusable-docker-ghcr.yml@v0.20.0
+    permissions:
+      contents: read
+      packages: write
     with:
       version_tag: ${{ needs.call-version-info-workflow.outputs.version_tag }}
+      user: ${{ github.actor }}
     secrets:
-      USER_TOKEN: ${{ secrets.HYDROSAR_RELEASE_TOKEN }}
+      USER_TOKEN: ${{ secrets.GITHUB_TOKEN }}

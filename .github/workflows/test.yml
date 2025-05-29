@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  call-pytest-workflow:
+    uses: ASFHyP3/actions/.github/workflows/reusable-pytest.yml@v0.20.0
+    permissions:
+      contents: read
+    with:
+      local_package_name: hydrosar
+      python_versions: >-
+        ["3.9", "3.10", "3.11", "3.12", "3.13"]
