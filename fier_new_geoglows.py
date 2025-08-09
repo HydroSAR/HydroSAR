@@ -10,10 +10,10 @@ import os
 import logging
 from pathlib import Path
 
-from geoglows import streams, data
-from sklearn import metrics
-from sklearn.model_selection import train_test_split
-from sklearn.decomposition import FactorAnalysis
+from geoglows import data
+# from sklearn import metrics
+# from sklearn.model_selection import train_test_split
+# from sklearn.decomposition import FactorAnalysis
 from typing import Tuple
 
 logging.basicConfig(level=logging.INFO)
@@ -286,124 +286,124 @@ def wrap_streamflow(lats: list, lons: list) -> Tuple[xr.DataArray, list]:
     return q, reaches      
 
 
-def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 100) -> xr.Dataset:
-    """Function to perform rotated empirical othogonal function (eof) on a spatial timeseries
+# def reof(stack: xr.DataArray, variance_threshold: float = 0.727, n_modes: int = 100) -> xr.Dataset:
+#     """Function to perform rotated empirical othogonal function (eof) on a spatial timeseries
 
-    args:
-        stack (xr.DataArray): DataArray of spatial temporal values with coord order of (t,y,x)
-        variance_threshold(float, optional): optional fall back value to select number of eof
-            modes to use. Only used if n_modes is less than 1. default = 0.727
-        n_modes (int, optional): number of eof modes to use. default = 4
+#     args:
+#         stack (xr.DataArray): DataArray of spatial temporal values with coord order of (t,y,x)
+#         variance_threshold(float, optional): optional fall back value to select number of eof
+#             modes to use. Only used if n_modes is less than 1. default = 0.727
+#         n_modes (int, optional): number of eof modes to use. default = 4
 
-    returns:
-        xr.Dataset: rotated eof dataset with spatial modes, temporal modes, and mean values
-            as variables
+#     returns:
+#         xr.Dataset: rotated eof dataset with spatial modes, temporal modes, and mean values
+#             as variables
 
-    """
+#     """
 
-    # extract out some dimension shape information
-    shape3d = stack.shape
-    spatial_shape = shape3d[1:]
-    shape2d = (shape3d[0],np.prod(spatial_shape))
+#     # extract out some dimension shape information
+#     shape3d = stack.shape
+#     spatial_shape = shape3d[1:]
+#     shape2d = (shape3d[0],np.prod(spatial_shape))
 
-    # flatten the data from [t,y,x] to [t,...]
-    da_flat = xr.DataArray(
-        stack.values.reshape(shape2d),
-        coords = [stack.time,np.arange(shape2d[1])],
-        dims=['time','space']
-    )
-    #logger.debug(da_flat)
+#     # flatten the data from [t,y,x] to [t,...]
+#     da_flat = xr.DataArray(
+#         stack.values.reshape(shape2d),
+#         coords = [stack.time,np.arange(shape2d[1])],
+#         dims=['time','space']
+#     )
+#     #logger.debug(da_flat)
         
-    ## find the temporal mean for each pixel
-    center = da_flat.mean(dim='time')
+#     ## find the temporal mean for each pixel
+#     center = da_flat.mean(dim='time')
     
-    centered = da_flat - center
+#     centered = da_flat - center
                
-    # get an eof solver object
-    # explicitly set center to false since data is already
-    #solver = Eof(centered,center=False)
-    solver = Eof(centered,center=False)
+#     # get an eof solver object
+#     # explicitly set center to false since data is already
+#     #solver = Eof(centered,center=False)
+#     solver = Eof(centered,center=False)
 
-    # check if the n_modes keyword is set to a realistic value
-    # if not get n_modes based on variance explained
-    if n_modes < 0:
-        n_modes = int((solver.varianceFraction().cumsum() < variance_threshold).sum())
+#     # check if the n_modes keyword is set to a realistic value
+#     # if not get n_modes based on variance explained
+#     if n_modes < 0:
+#         n_modes = int((solver.varianceFraction().cumsum() < variance_threshold).sum())
     
-    # get total and cumulated total variance fractions of eof (up to the max. retained mode)
-    total_eof_var_frac = solver.varianceFraction(neigs=n_modes).cumsum()
+#     # get total and cumulated total variance fractions of eof (up to the max. retained mode)
+#     total_eof_var_frac = solver.varianceFraction(neigs=n_modes).cumsum()
     
-    # Determine how many modes we need to represent 90% of the dataset's variance
-    ind_90 = np.where(np.abs(total_eof_var_frac-0.9) == np.min(np.abs(total_eof_var_frac-0.9)))[0][0]
+#     # Determine how many modes we need to represent 90% of the dataset's variance
+#     ind_90 = np.where(np.abs(total_eof_var_frac-0.9) == np.min(np.abs(total_eof_var_frac-0.9)))[0][0]
     
-    # Plot the amount of variance depending on each mode
-    plt.figure()
-    plt.plot(total_eof_var_frac*100)
-    plt.xlabel('amount of modes')
-    plt.ylabel('dataset variance explained by the modes [%]')
-    plt.axhline(y = 90, color = 'r', linestyle = '-')
-    plt.axvline(x = ind_90, color = 'red')
-    plt.title(f"90% of the variance is explained by the first {ind_90} modes") 
+#     # Plot the amount of variance depending on each mode
+#     plt.figure()
+#     plt.plot(total_eof_var_frac*100)
+#     plt.xlabel('amount of modes')
+#     plt.ylabel('dataset variance explained by the modes [%]')
+#     plt.axhline(y = 90, color = 'r', linestyle = '-')
+#     plt.axvline(x = ind_90, color = 'red')
+#     plt.title(f"90% of the variance is explained by the first {ind_90} modes") 
 
-    # Set the amount of modes to that 90% cutoff
-    n_modes = ind_90
+#     # Set the amount of modes to that 90% cutoff
+#     n_modes = ind_90
     
-    # Crop the total eof variance fraction
-    total_eof_var_frac = total_eof_var_frac[:n_modes] 
+#     # Crop the total eof variance fraction
+#     total_eof_var_frac = total_eof_var_frac[:n_modes] 
 
-    # calculate to spatial eof values
-    eof_components = solver.eofs(neofs=100).transpose()
+#     # calculate to spatial eof values
+#     eof_components = solver.eofs(neofs=100).transpose()
 
-    # get the indices where the eof is valid data
-    non_masked_idx = np.where(np.logical_not(np.isnan(eof_components[:,0])))[0]
+#     # get the indices where the eof is valid data
+#     non_masked_idx = np.where(np.logical_not(np.isnan(eof_components[:,0])))[0]
 
-    # create a "blank" array to set roated values to
-    rotated = eof_components.copy()
+#     # create a "blank" array to set roated values to
+#     rotated = eof_components.copy()
 
-    # # waiting for release of sklean version >= 0.24
-    # # until then have a placeholder function to do the rotation
-    fa = FactorAnalysis(n_components=100, rotation="varimax")
-    rotated[non_masked_idx,:] = fa.fit_transform(eof_components[non_masked_idx,:])
-    rotated = rotated.values[:,:n_modes] # We crop out the last mode that is usually filled with 0s
+#     # # waiting for release of sklean version >= 0.24
+#     # # until then have a placeholder function to do the rotation
+#     fa = FactorAnalysis(n_components=100, rotation="varimax")
+#     rotated[non_masked_idx,:] = fa.fit_transform(eof_components[non_masked_idx,:])
+#     rotated = rotated.values[:,:n_modes] # We crop out the last mode that is usually filled with 0s
 
-    # project the original time series data on the rotated eofs
-    projected_pcs = np.dot(centered[:,non_masked_idx], rotated[non_masked_idx,:])
+#     # project the original time series data on the rotated eofs
+#     projected_pcs = np.dot(centered[:,non_masked_idx], rotated[non_masked_idx,:])
     
-    # get variance of each rotated mode
-    rot_var = np.var(projected_pcs, axis=0)
+#     # get variance of each rotated mode
+#     rot_var = np.var(projected_pcs, axis=0)
     
-    # get variance of all rotated modes
-    total_rot_var = rot_var.cumsum()
+#     # get variance of all rotated modes
+#     total_rot_var = rot_var.cumsum()
     
-    # get variance fraction of each rotated mode
-    rot_var_frac = ((rot_var/total_rot_var)*total_eof_var_frac)*100
+#     # get variance fraction of each rotated mode
+#     rot_var_frac = ((rot_var/total_rot_var)*total_eof_var_frac)*100
     
-    # reshape the rotated eofs to a 3d array of [y,x,c]
-    spatial_rotated = rotated.reshape(spatial_shape+(n_modes,))
+#     # reshape the rotated eofs to a 3d array of [y,x,c]
+#     spatial_rotated = rotated.reshape(spatial_shape+(n_modes,))
 
-    # sort modes based on variance fraction of REOF
-    indx_rot_var_frac_sort = np.expand_dims(((np.argsort(-1*rot_var_frac)).data), axis=0)        
-    projected_pcs = np.take_along_axis(projected_pcs,indx_rot_var_frac_sort,axis=1)
+#     # sort modes based on variance fraction of REOF
+#     indx_rot_var_frac_sort = np.expand_dims(((np.argsort(-1*rot_var_frac)).data), axis=0)        
+#     projected_pcs = np.take_along_axis(projected_pcs,indx_rot_var_frac_sort,axis=1)
     
-    indx_rot_var_frac_sort = np.expand_dims(indx_rot_var_frac_sort, axis=0)
-    spatial_rotated = np.take_along_axis(spatial_rotated,indx_rot_var_frac_sort,axis=2)
+#     indx_rot_var_frac_sort = np.expand_dims(indx_rot_var_frac_sort, axis=0)
+#     spatial_rotated = np.take_along_axis(spatial_rotated,indx_rot_var_frac_sort,axis=2)
 
-    # structure the spatial and temporal reof components in a Dataset. We squeeze out the last n_mode because it is empty
-    reof_ds = xr.Dataset(
-        {
-            "spatial_modes": (["lat","lon","mode"],spatial_rotated),
-            "temporal_modes":(["time","mode"],projected_pcs),
-            "center": (["lat","lon"],center.values.reshape(spatial_shape))
-        },
-        coords = {
-            "lon":(["lon"],stack.lon.values),
-            "lat":(["lat"],stack.lat.values),
-            "time":stack.time.values,
-            "mode": np.arange(n_modes)
-        }
-    )
+#     # structure the spatial and temporal reof components in a Dataset. We squeeze out the last n_mode because it is empty
+#     reof_ds = xr.Dataset(
+#         {
+#             "spatial_modes": (["lat","lon","mode"],spatial_rotated),
+#             "temporal_modes":(["time","mode"],projected_pcs),
+#             "center": (["lat","lon"],center.values.reshape(spatial_shape))
+#         },
+#         coords = {
+#             "lon":(["lon"],stack.lon.values),
+#             "lat":(["lat"],stack.lat.values),
+#             "time":stack.time.values,
+#             "mode": np.arange(n_modes)
+#         }
+#     )
 
 
-    return reof_ds
+#     return reof_ds
 
 
 def _ortho_rotation(components: np.array, method: str = 'varimax', tol: float = 1e-6, max_iter: int = 100) -> np.array:
@@ -431,33 +431,33 @@ def _ortho_rotation(components: np.array, method: str = 'varimax', tol: float = 
 
 
 
-def get_streamflow(lat: float, lon: float) -> Tuple[xr.DataArray, int]:
-    """Function to get histroical streamflow data from the GeoGLOWS server
-    based on geographic coordinates
+# def get_streamflow(lat: float, lon: float) -> Tuple[xr.DataArray, int]:
+#     """Function to get histroical streamflow data from the GeoGLOWS server
+#     based on geographic coordinates
 
-    args:
-        lat (float): latitude value where to get streamflow data
-        lon (float): longitude value where to get streamflow data
+#     args:
+#         lat (float): latitude value where to get streamflow data
+#         lon (float): longitude value where to get streamflow data
 
-    returns:
-        xr.DataArray: DataArray object of streamflow with datetime coordinates
-    """
+#     returns:
+#         xr.DataArray: DataArray object of streamflow with datetime coordinates
+#     """
    
     
-    # ??? pass lat lon or do it by basin ???
-    ID = streams.latlon_to_river(lat, lon)
-    # send request for the streamflow data
-    q = data.retrospective(ID)
+#     # ??? pass lat lon or do it by basin ???
+#     ID = streams.latlon_to_river(lat, lon)
+#     # send request for the streamflow data
+#     q = data.retrospective(ID)
 
-    # rename column name to something not as verbose as 'streamflow_m^3/s'
-    q.columns = ["discharge"]
+#     # rename column name to something not as verbose as 'streamflow_m^3/s'
+#     q.columns = ["discharge"]
 
-    # rename index and drop the timezone value
-    q.index.name = "time"
-    q.index = q.index.tz_localize(None)
+#     # rename index and drop the timezone value
+#     q.index.name = "time"
+#     q.index = q.index.tz_localize(None)
 
-    # return the series as a xr.DataArray
-    return q.discharge.to_xarray(), ID
+#     # return the series as a xr.DataArray
+#     return q.discharge.to_xarray(), ID
 
 
 def match_dates(original: xr.DataArray, matching: xr.DataArray) -> xr.DataArray:
