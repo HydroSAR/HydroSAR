@@ -4,10 +4,12 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Union
 
+import xarray as xr
 from asf_tools import vector
 from asf_tools.util import GDALConfigManager, get_epsg_code
 from osgeo import gdal, ogr
 from rasterio.enums import Resampling
+from shapely import wkt
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
 
@@ -60,24 +62,40 @@ def prepare_hand_for_raster(
         resampling_method: Name of the resampling method to use. For available methods, see:
             https://gdal.org/programs/gdalwarp.html#cmdoption-gdalwarp-r
     """
-    info = gdal.Info(str(source_raster), format='json')
 
-    hand_geometry = shape(info['wgs84Extent'])
-    hand_bounds = [
-        info['cornerCoordinates']['upperLeft'][0],
-        info['cornerCoordinates']['lowerRight'][1],
-        info['cornerCoordinates']['lowerRight'][0],
-        info['cornerCoordinates']['upperLeft'][1],
-    ]
+    if isinstance(source_raster, xr.core.dataarray.DataArray):
+        geobox = source_raster.odc.geobox.extent.to_crs("EPSG:4326")
+        hand_geometry = wkt.loads(geobox.wkt)
+        out_crs = source_raster.odc.crs
+        utm_bbox = source_raster.odc.output_geobox(out_crs).extent.boundingbox
+        hand_bounds = [
+            utm_bbox.left,
+            utm_bbox.bottom,
+            utm_bbox.right,
+            utm_bbox.top
+        ]
+        epsg = out_crs.to_epsg()
+        height, width = source_raster.shape[0], source_raster.shape[1]
+    else:
+        info = gdal.Info(str(source_raster), format='json')
+        hand_geometry = shape(info['wgs84Extent'])
+        hand_bounds = [
+            info['cornerCoordinates']['upperLeft'][0],
+            info['cornerCoordinates']['lowerRight'][1],
+            info['cornerCoordinates']['lowerRight'][0],
+            info['cornerCoordinates']['upperLeft'][1],
+        ]
+        epsg = get_epsg_code(info)
+        width, height = info['size'][0], info['size'][1],
 
     with NamedTemporaryFile(suffix='.vrt', delete=False) as hand_vrt:
         prepare_hand_vrt(hand_vrt.name, hand_geometry)
         gdal.Warp(
             str(hand_raster),
             hand_vrt.name,
-            dstSRS=f'EPSG:{get_epsg_code(info)}',
+            dstSRS=f'EPSG:{epsg}',
             outputBounds=hand_bounds,
-            width=info['size'][0],
-            height=info['size'][1],
+            width=width,
+            height=height,
             resampleAlg=Resampling[resampling_method].value,
         )

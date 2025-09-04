@@ -15,6 +15,7 @@ from typing import Literal, Optional, Tuple, Union
 
 import numpy as np
 import skfuzzy as fuzz
+import xarray as xr
 from asf_tools.aws import get_path_to_s3_file, upload_file_to_s3
 from asf_tools.raster import read_as_masked_array, write_cog
 from asf_tools.tile import tile_array, untile_array
@@ -184,8 +185,8 @@ def fuzzy_refinement(
 
 def make_water_map(
     out_raster: Union[str, Path],
-    vv_raster: Union[str, Path],
-    vh_raster: Union[str, Path],
+    vv_raster: Union[str, Path, xr.core.dataarray.DataArray],
+    vh_raster: Union[str, Path, xr.core.dataarray.DataArray],
     hand_raster: Optional[Union[str, Path]] = None,
     tile_shape: Tuple[int, int] = (100, 100),
     max_vv_threshold: float = -15.5,
@@ -252,10 +253,14 @@ def make_water_map(
     if tile_shape[0] % 2 or tile_shape[1] % 2:
         raise ValueError(f'tile_shape {tile_shape} requires even values.')
 
-    info = gdal.Info(str(vh_raster), format='json')
-
-    out_transform = info['geoTransform']
-    out_epsg = get_epsg_code(info)
+    if isinstance(vh_raster, xr.core.dataarray.DataArray):
+        out_transform = vh_raster.odc.geobox.transform.to_gdal()
+        out_crs = vh_raster.odc.crs
+        out_epsg = out_crs.to_epsg()
+    else:
+        info = gdal.Info(str(vh_raster), format='json')
+        out_transform = info['geoTransform']
+        out_epsg = get_epsg_code(info)
 
     if hand_raster is None:
         hand_raster = str(out_raster).replace('.tif', '_HAND.tif')
@@ -274,7 +279,11 @@ def make_water_map(
     water_extent_maps = []
     for max_db_threshold, raster, pol in ((max_vh_threshold, vh_raster, 'VH'), (max_vv_threshold, vv_raster, 'VV')):
         log.info(f'Creating initial {pol} water extent map from {raster}')
-        array = read_as_masked_array(raster)
+
+        if isinstance(vh_raster, xr.core.dataarray.DataArray):
+            array = raster.to_masked_array()
+        else:
+            array = read_as_masked_array(raster)
 
         # OPERA data returns invalid mask so regenrate it
         # We can hopefully remove this after resolving https://github.com/ASFHyP3/asf-tools/issues/270
