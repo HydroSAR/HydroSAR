@@ -1,0 +1,30 @@
+name: hydrosar_odc
+channels: 
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python==3.11 # scikit-fuzzy 0.4.2 imports imp, which is deprecated in Python 3.12 
+  - ciso8601
+  - gdal
+  - geopandas
+  - hydrosar
+  - hyp3_sdk
+  - ipyfilechooser
+  - numpy<2  
+  - pandas
+  - pip
+  - pyproj
+  - rasterio
+  - scikit-fuzzy
+  - xarray
+  - matplotlib-base
+  - jupyterlab
+  - ipympl
+  - ipykernel
+  - pip:
+    - dea-tools[notebooks]>0.4
+    - dask-labextension
+    - jupyter-resource-usage
+    - shap
+    - lightgbm
+    - xgboost
