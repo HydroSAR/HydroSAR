@@ -64,16 +64,11 @@ def prepare_hand_for_raster(
     """
 
     if isinstance(source_raster, xr.core.dataarray.DataArray):
-        geobox = source_raster.odc.geobox.extent.to_crs("EPSG:4326")
+        geobox = source_raster.odc.geobox.extent.to_crs('EPSG:4326')
         hand_geometry = wkt.loads(geobox.wkt)
         out_crs = source_raster.odc.crs
         utm_bbox = source_raster.odc.output_geobox(out_crs).extent.boundingbox
-        hand_bounds = [
-            utm_bbox.left,
-            utm_bbox.bottom,
-            utm_bbox.right,
-            utm_bbox.top
-        ]
+        hand_bounds = [utm_bbox.left, utm_bbox.bottom, utm_bbox.right, utm_bbox.top]
         epsg = out_crs.to_epsg()
         height, width = source_raster.shape[0], source_raster.shape[1]
     else:
@@ -86,7 +81,10 @@ def prepare_hand_for_raster(
             info['cornerCoordinates']['upperLeft'][1],
         ]
         epsg = get_epsg_code(info)
-        width, height = info['size'][0], info['size'][1],
+        width, height = (
+            info['size'][0],
+            info['size'][1],
+        )
 
     with NamedTemporaryFile(suffix='.vrt', delete=False) as hand_vrt:
         prepare_hand_vrt(hand_vrt.name, hand_geometry)
