@@ -1,4 +1,5 @@
 """Prepare a Height Above Nearest Drainage (HAND) virtual raster (VRT) covering a given geometry"""
+
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Union
@@ -9,6 +10,7 @@ from osgeo import gdal, ogr
 from rasterio.enums import Resampling
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
+
 
 HAND_GEOJSON = '/vsicurl/https://glo-30-hand.s3.amazonaws.com/v1/2021/glo-30-hand.geojson'
 
@@ -35,7 +37,7 @@ def prepare_hand_vrt(vrt: Union[str, Path], geometry: Union[ogr.Geometry, BaseGe
             geometry = ogr.CreateGeometryFromWkb(geometry.wkb)
 
         min_lon, max_lon, _, _ = geometry.GetEnvelope()
-        if min_lon < -160. and max_lon > 160.:
+        if min_lon < -160.0 and max_lon > 160.0:
             raise ValueError(f'asf_tools does not currently support geometries that cross the antimeridian: {geometry}')
 
         tile_features = vector.get_features(HAND_GEOJSON)
@@ -47,8 +49,9 @@ def prepare_hand_vrt(vrt: Union[str, Path], geometry: Union[ogr.Geometry, BaseGe
         gdal.BuildVRT(str(vrt), hand_file_paths)
 
 
-def prepare_hand_for_raster(hand_raster: Union[str, Path], source_raster: Union[str, Path],
-                            resampling_method: str = 'lanczos'):
+def prepare_hand_for_raster(
+    hand_raster: Union[str, Path], source_raster: Union[str, Path], resampling_method: str = 'lanczos'
+):
     """Create a HAND raster pixel-aligned to a source raster
 
     Args:
@@ -60,13 +63,21 @@ def prepare_hand_for_raster(hand_raster: Union[str, Path], source_raster: Union[
     info = gdal.Info(str(source_raster), format='json')
 
     hand_geometry = shape(info['wgs84Extent'])
-    hand_bounds = [info['cornerCoordinates']['upperLeft'][0],
-                   info['cornerCoordinates']['lowerRight'][1],
-                   info['cornerCoordinates']['lowerRight'][0],
-                   info['cornerCoordinates']['upperLeft'][1]]
+    hand_bounds = [
+        info['cornerCoordinates']['upperLeft'][0],
+        info['cornerCoordinates']['lowerRight'][1],
+        info['cornerCoordinates']['lowerRight'][0],
+        info['cornerCoordinates']['upperLeft'][1],
+    ]
 
     with NamedTemporaryFile(suffix='.vrt', delete=False) as hand_vrt:
         prepare_hand_vrt(hand_vrt.name, hand_geometry)
-        gdal.Warp(str(hand_raster), hand_vrt.name, dstSRS=f'EPSG:{get_epsg_code(info)}',
-                  outputBounds=hand_bounds, width=info['size'][0], height=info['size'][1],
-                  resampleAlg=Resampling[resampling_method].value)
+        gdal.Warp(
+            str(hand_raster),
+            hand_vrt.name,
+            dstSRS=f'EPSG:{get_epsg_code(info)}',
+            outputBounds=hand_bounds,
+            width=info['size'][0],
+            height=info['size'][1],
+            resampleAlg=Resampling[resampling_method].value,
+        )

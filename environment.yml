@@ -5,24 +5,18 @@ channels:
 dependencies:
   - python>=3.8
   - pip
-  # For packaging, and testing
-  - build
-  - flake8
-  - flake8-import-order
-  - flake8-blind-except
-  - flake8-builtins
-  - setuptools>=61
+  # For packaging and testing
   - setuptools_scm>=6.2
   - pytest
   - pytest-console-scripts
   - pytest-cov
   # For running
-  - asf_tools
+  - asf_tools>=0.6
   - astropy
   - boto3
   - fiona
   - gdal>=3.7
-  - numpy
+  - numpy<2
   - pysheds>=0.3
   - rasterio
   - scikit-fuzzy
@@ -32,4 +26,5 @@ dependencies:
   - tqdm
   - pip:
     # for testing
+    - -r requirements-static.txt
     - gdal-utils
