@@ -14,7 +14,7 @@ dependencies:
   - hydrosar
   - hyp3_sdk
   - ipyfilechooser
-  - numpy<2  
+  - numpy #<2  
   - pandas
   - pip
   - pyproj
