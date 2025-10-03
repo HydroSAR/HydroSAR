@@ -154,11 +154,11 @@ def estimate_flood_depth(
                 hand, flood_labels == label, water_levels=water_levels, minimization_metric=minimization_metric
             )
 
-        if estimator.lower() == 'nmad':
+        elif estimator.lower() == 'nmad':
             hand_mean = np.nanmean(hand[flood_labels == label])
             hand_std = stats.median_abs_deviation(hand[flood_labels == label], scale='normal', nan_policy='omit')
 
-        if estimator.lower() == 'numpy':
+        elif estimator.lower() == 'numpy':
             hand_mean = np.nanmean(hand[flood_labels == label])
             hand_std = np.nanstd(hand[flood_labels == label])
 
