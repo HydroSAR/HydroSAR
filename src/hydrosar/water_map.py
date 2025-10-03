@@ -275,6 +275,12 @@ def make_water_map(
     for max_db_threshold, raster, pol in ((max_vh_threshold, vh_raster, 'VH'), (max_vv_threshold, vv_raster, 'VV')):
         log.info(f'Creating initial {pol} water extent map from {raster}')
         array = read_as_masked_array(raster)
+
+        # OPERA data returns invalid mask so regenrate it
+        # We can hopefully remove this after resolving https://github.com/ASFHyP3/asf-tools/issues/270
+        if array.mask is np.ma.nomask:
+            array = np.ma.masked_invalid(array)
+
         padding_mask = array.mask
         tiles = tile_array(array, tile_shape=tile_shape, pad_value=0.0)
         # Masking less than zero only necessary for old HyP3/GAMMA products which sometimes returned negative powers
