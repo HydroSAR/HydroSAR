@@ -16,6 +16,6 @@ jobs:
     permissions:
       contents: read
     with:
-      local_package_name: hydrosar
+      local_package_name: "hydrosar --integration"
       python_versions: >-
         ["3.9", "3.10", "3.11"]
