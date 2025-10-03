@@ -90,12 +90,13 @@ quote-style = "single"
 
 [tool.ruff.lint]
 extend-select = [
-    "I",   # isort: https://docs.astral.sh/ruff/rules/#isort-i
-    # TODO: Enable this as errors have been addressed
-    # "UP",  # pyupgrade: https://docs.astral.sh/ruff/rules/#pyupgrade-up
-    # "D",   # pydocstyle: https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    # TODO: Enable commented out  rules and address
     # "ANN", # annotations: https://docs.astral.sh/ruff/rules/#flake8-annotations-ann
+    # "D",   # pydocstyle: https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    "I",   # isort: https://docs.astral.sh/ruff/rules/#isort-i
+    "NPY", # numpy-specific rules: https://docs.astral.sh/ruff/rules/#numpy-specific-rules-npy
     # "PTH", # use-pathlib-pth: https://docs.astral.sh/ruff/rules/#flake8-use-pathlib-pth
+    # "UP",  # pyupgrade: https://docs.astral.sh/ruff/rules/#pyupgrade-up
 ]
 
 [tool.ruff.lint.pydocstyle]
