@@ -6,7 +6,6 @@ dependencies:
   - python>=3.8
   - pip
   # For packaging and testing
-  - ruff
   - setuptools_scm>=6.2
   - pytest
   - pytest-console-scripts
@@ -27,4 +26,5 @@ dependencies:
   - tqdm
   - pip:
     # for testing
+    - -r requirements-static.txt
     - gdal-utils

@@ -7,9 +7,9 @@ on:
 
 jobs:
   call-release-workflow:
-    uses: ASFHyP3/actions/.github/workflows/reusable-release.yml@v0.15.0
+    uses: ASFHyP3/actions/.github/workflows/reusable-release.yml@v0.20.0
+    permissions: { }
     with:
       release_prefix: HydroSAR
-      sync_pr_label: CI/CD
     secrets:
       USER_TOKEN: ${{ secrets.HYDROSAR_RELEASE_TOKEN }}
