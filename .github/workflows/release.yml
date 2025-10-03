@@ -11,6 +11,5 @@ jobs:
     permissions: { }
     with:
       release_prefix: HydroSAR
-      sync_pr_label: bumpless
     secrets:
       USER_TOKEN: ${{ secrets.HYDROSAR_RELEASE_TOKEN }}
