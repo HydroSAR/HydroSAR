@@ -241,14 +241,37 @@ def make_water_map(
         vv_raster: Sentinel-1 RTC GeoTIFF, in power scale, with VV polarization
         vh_raster: Sentinel-1 RTC GeoTIFF, in power scale, with VH polarization
         hand_raster: Height Above Nearest Drainage (HAND) GeoTIFF aligned to the RTC rasters
-        tile_shape: shape (height, width) in pixels to tile the image to
-        max_vv_threshold: Maximum threshold value to use for `vv_raster` in decibels (db)
-        max_vh_threshold:  Maximum threshold value to use for `vh_raster` in decibels (db)
-        hand_threshold: The maximum height above nearest drainage in meters to consider
-            a pixel valid
-        hand_fraction: The minimum fraction of valid HAND pixels required in a tile for
-            thresholding
-        membership_threshold: The average membership to the fuzzy indicators required for a water pixel
+        tile_shape: Shape (height, width) in pixels for tiling the image. Expectation Maximization (EM)
+            is performed on each tile, so defining the tile size determines how local EM is. Overly small 
+            tiles will be more sensitive to heterogeneous areas, but may not contain enough water and 
+            no-water pixels to provide sufficient variance for EM. Oversized tiles likely contain enough 
+            water and land pixels but may contain a large variety of scatterers, and lead to the smoothing
+            over of important spatial differences. The ideal tile size will vary depending on the size of 
+            the water body, the heterogeneity of the environment, and the resolution of the data. An ideal 
+            tile contains both land and water pixels, providing sufficient variance for EM.
+        max_vv_threshold and max_vh_threshold: Maximum threshold value to use for `vv_raster`  and `vh_raster` 
+            in decibels (db). EM can produce water brightness thresholds that are unrealistically bright. 
+            The max_vv_threshold and max_vh_threshold cap the maximum brightness for the EM-derived water 
+            threshold. If they are set very low, only the darkest pixels will be classified as water. 
+            This would reduce false positives but may miss brighter water pixels (windblown water, flooded 
+            vegetation containing double-bounce scatterers, etc.). If the thresholds are set very high, 
+            the algorithm may correctly classify brighter water pixels, but misclassify darker land pixels.
+        hand_threshold: The maximum Height Above Nearest Drainage (HAND) in meters to consider a pixel valid.
+            The hand_hreshold determines how high above a local drainage a pixel can be and still potentially 
+            be classified as water. Any pixel above this height will not be considered for EM tile selection 
+            and will receive a low fuzzy membership score.
+        hand_fraction: This is used to determine whether a tile will be included for EM. A tile is only eligible
+            for EM if at least this fraction of its pixels is below the hand_threshold. Lowering the hand_fraction
+            allows for the inclusion of a larger quantity of higher-altitude pixels, and so may be suitable for 
+            rugged terrain. A lower hand_threshold would likely restrict EM tile selection to areas very close 
+            to the drainage. 
+        membership_threshold: The minimum membership to the fuzzy indicators required for a water pixel.
+            This threshold is applied during the fuzzy-logic step and can be adjusted to make 
+            the fuzzy logic check more or less permissive when including or excluding water pixels. The four 
+            indicators used for fuzzy logic are pixel darkness (relative to backscatter thresholds), elevation
+            (relative to the hand_threshold), slope, and segment area (connected water body size). Lowering the
+            membership_threshold will result in a more permissive classification of water pixels, whereas a higher
+            threshold will lead to a more conservative classification.
     """
     if tile_shape[0] % 2 or tile_shape[1] % 2:
         raise ValueError(f'tile_shape {tile_shape} requires even values.')
