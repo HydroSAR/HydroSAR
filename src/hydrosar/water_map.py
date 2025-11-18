@@ -249,7 +249,7 @@ def make_water_map(
             over of important spatial differences. The ideal tile size will vary depending on the size of 
             the water body, the heterogeneity of the environment, and the resolution of the data. An ideal 
             tile contains both land and water pixels, providing sufficient variance for EM.
-        max_vv_threshold and max_vh_threshold: Maximum threshold value to use for `vv_raster`  and `vh_raster` 
+        max_vv_threshold and max_vh_threshold: Maximum threshold values to use for `vv_raster`  and `vh_raster` 
             in decibels (db). EM can produce water brightness thresholds that are unrealistically bright. 
             The max_vv_threshold and max_vh_threshold cap the maximum brightness for the EM-derived water 
             threshold. If they are set very low, only the darkest pixels will be classified as water. 
@@ -257,14 +257,13 @@ def make_water_map(
             vegetation containing double-bounce scatterers, etc.). If the thresholds are set very high, 
             the algorithm may correctly classify brighter water pixels, but misclassify darker land pixels.
         hand_threshold: The maximum Height Above Nearest Drainage (HAND) in meters to consider a pixel valid.
-            The hand_hreshold determines how high above a local drainage a pixel can be and still potentially 
+            The hand_threshold determines how high above a local drainage a pixel can be and still potentially 
             be classified as water. Any pixel above this height will not be considered for EM tile selection 
             and will receive a low fuzzy membership score.
         hand_fraction: This is used to determine whether a tile will be included for EM. A tile is only eligible
             for EM if at least this fraction of its pixels is below the hand_threshold. Lowering the hand_fraction
             allows for the inclusion of a larger quantity of higher-altitude pixels, and so may be suitable for 
-            rugged terrain. A lower hand_threshold would likely restrict EM tile selection to areas very close 
-            to the drainage. 
+            rugged terrain. A lower hand_threshold would likely restrict EM tile selection to flatter areas near the drainage. 
         membership_threshold: The minimum membership to the fuzzy indicators required for a water pixel.
             This threshold is applied during the fuzzy-logic step and can be adjusted to make 
             the fuzzy logic check more or less permissive when including or excluding water pixels. The four 
