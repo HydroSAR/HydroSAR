@@ -7,7 +7,7 @@ on:
 
 jobs:
   call-version-info-workflow:
-    uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.20.0
+    uses: ASFHyP3/actions/.github/workflows/reusable-version-info.yml@v0.21.0
     permissions:
       contents: read
 
@@ -17,7 +17,7 @@ jobs:
       run:
         shell: bash -l {0}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
