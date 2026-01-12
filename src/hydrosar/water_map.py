@@ -268,19 +268,19 @@ def make_water_map(
 
     # Warn if user asked to write HAND but also supplied one
     if hand_out and hand_raster is not None:
-        log.warning("hand_out=True ignored because hand_raster was provided.")
+        log.warning('hand_out=True ignored because hand_raster was provided.')
 
     if isinstance(hand_raster, xr.DataArray):
         hand_array = hand_raster.to_masked_array()
-        hand_source = "provided xarray"
+        hand_source = 'provided xarray'
 
     elif isinstance(hand_raster, (str, Path)):
         hand_array = read_as_masked_array(hand_raster)
-        hand_source = f"provided raster: {hand_raster}"
+        hand_source = f'provided raster: {hand_raster}'
 
     else:
         if hand_out:
-            out_path = str(Path(out_raster).with_suffix("")) + "_HAND.tif"
+            out_path = str(Path(out_raster).with_suffix('')) + '_HAND.tif'
             log.info(f'Extracting HAND data to: {out_path}')
 
         hand_xr = prepare_hand_for_raster(
@@ -289,7 +289,7 @@ def make_water_map(
             return_xarray=True,
         )
         hand_array = hand_xr.to_masked_array()
-        hand_source = "computed xarray"
+        hand_source = 'computed xarray'
 
     if out_path is not None:
         log.info(f'Determining HAND memberships from {hand_source}, which is also written out to {out_path}')

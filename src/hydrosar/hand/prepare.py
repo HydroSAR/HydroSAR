@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Union, Optional
+from typing import Optional, Union
 
 import xarray as xr
 from asf_tools import vector
@@ -52,8 +52,10 @@ def prepare_hand_vrt(vrt: Union[str, Path], geometry: Union[ogr.Geometry, BaseGe
 
 
 def prepare_hand_for_raster(
-    source_raster: Union[str, Path, xr.DataArray], hand_raster: Optional[Union[str, Path]] = None,
-    return_xarray: bool = True, resampling_method: str = 'lanczos'
+    source_raster: Union[str, Path, xr.DataArray],
+    hand_raster: Optional[Union[str, Path]] = None,
+    return_xarray: bool = True,
+    resampling_method: str = 'lanczos',
 ):
     """Create a HAND raster pixel-aligned to a source raster
 
@@ -64,7 +66,7 @@ def prepare_hand_for_raster(
             https://gdal.org/programs/gdalwarp.html#cmdoption-gdalwarp-r
     """
     if hand_raster is None and not return_xarray:
-        raise ValueError("At least one output must be requested: set hand_raster to a path and/or return_xarray=True.")
+        raise ValueError('At least one output must be requested: set hand_raster to a path and/or return_xarray=True.')
 
     if isinstance(source_raster, xr.core.dataarray.DataArray):
         geobox = source_raster.odc.geobox.extent.to_crs('EPSG:4326')
