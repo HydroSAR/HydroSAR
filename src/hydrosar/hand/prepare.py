@@ -2,7 +2,7 @@
 
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Union
+from typing import Union, Optional
 
 import xarray as xr
 from asf_tools import vector
@@ -52,7 +52,8 @@ def prepare_hand_vrt(vrt: Union[str, Path], geometry: Union[ogr.Geometry, BaseGe
 
 
 def prepare_hand_for_raster(
-    hand_raster: Union[str, Path], source_raster: Union[str, Path], resampling_method: str = 'lanczos'
+    source_raster: Union[str, Path, xr.DataArray], hand_raster: Optional[Union[str, Path]] = None,
+    return_xarray: bool = True, resampling_method: str = 'lanczos'
 ):
     """Create a HAND raster pixel-aligned to a source raster
 
@@ -62,6 +63,8 @@ def prepare_hand_for_raster(
         resampling_method: Name of the resampling method to use. For available methods, see:
             https://gdal.org/programs/gdalwarp.html#cmdoption-gdalwarp-r
     """
+    if hand_raster is None and not return_xarray:
+        raise ValueError("At least one output must be requested: set hand_raster to a path and/or return_xarray=True.")
 
     if isinstance(source_raster, xr.core.dataarray.DataArray):
         geobox = source_raster.odc.geobox.extent.to_crs('EPSG:4326')
@@ -88,8 +91,13 @@ def prepare_hand_for_raster(
 
     with NamedTemporaryFile(suffix='.vrt', delete=False) as hand_vrt:
         prepare_hand_vrt(hand_vrt.name, hand_geometry)
+        # Choose output target
+        if hand_raster is None:
+            out_path = '/vsimem/hand_aligned.tif'
+        else:
+            out_path = str(hand_raster)
         gdal.Warp(
-            str(hand_raster),
+            out_path,
             hand_vrt.name,
             dstSRS=f'EPSG:{epsg}',
             outputBounds=hand_bounds,
@@ -97,3 +105,20 @@ def prepare_hand_for_raster(
             height=height,
             resampleAlg=Resampling[resampling_method].value,
         )
+
+    if not return_xarray:
+        return None
+
+    ds = gdal.Open(out_path)
+    band = ds.GetRasterBand(1)
+    hand_array = band.ReadAsArray()
+    ds = None
+
+    # Clean up /vsimem output if used
+    if hand_raster is None:
+        try:
+            gdal.Unlink(out_path)
+        except Exception:
+            pass
+
+    return xr.DataArray(hand_array, dims=('y', 'x'))
