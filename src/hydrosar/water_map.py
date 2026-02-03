@@ -185,9 +185,10 @@ def fuzzy_refinement(
 
 def make_water_map(
     out_raster: Union[str, Path],
-    vv_raster: Union[str, Path, xr.core.dataarray.DataArray],
-    vh_raster: Union[str, Path, xr.core.dataarray.DataArray],
-    hand_raster: Optional[Union[str, Path]] = None,
+    vv_raster: Union[str, Path, xr.DataArray],
+    vh_raster: Union[str, Path, xr.DataArray],
+    hand_raster: Optional[Union[str, Path, xr.DataArray]] = None,
+    hand_out: bool = False,
     tile_shape: Tuple[int, int] = (100, 100),
     max_vv_threshold: float = -15.5,
     max_vh_threshold: float = -23.0,
@@ -241,6 +242,7 @@ def make_water_map(
         vv_raster: Sentinel-1 RTC GeoTIFF, in power scale, with VV polarization
         vh_raster: Sentinel-1 RTC GeoTIFF, in power scale, with VH polarization
         hand_raster: Height Above Nearest Drainage (HAND) GeoTIFF aligned to the RTC rasters
+        hand_out: Whether to output the HAND as a raster
         tile_shape: shape (height, width) in pixels to tile the image to
         max_vv_threshold: Maximum threshold value to use for `vv_raster` in decibels (db)
         max_vh_threshold:  Maximum threshold value to use for `vh_raster` in decibels (db)
@@ -253,7 +255,7 @@ def make_water_map(
     if tile_shape[0] % 2 or tile_shape[1] % 2:
         raise ValueError(f'tile_shape {tile_shape} requires even values.')
 
-    if isinstance(vh_raster, xr.core.dataarray.DataArray):
+    if isinstance(vh_raster, xr.DataArray):
         out_transform = vh_raster.odc.geobox.transform.to_gdal()
         out_crs = vh_raster.odc.crs
         out_epsg = out_crs.to_epsg()
@@ -262,15 +264,39 @@ def make_water_map(
         out_transform = info['geoTransform']
         out_epsg = get_epsg_code(info)
 
-    if hand_raster is None:
-        hand_raster = str(out_raster).replace('.tif', '_HAND.tif')
-        log.info(f'Extracting HAND data to: {hand_raster}')
-        prepare_hand_for_raster(hand_raster, vh_raster)
+    out_path = None
 
-    log.info(f'Determining HAND memberships from {hand_raster}')
-    hand_array = read_as_masked_array(hand_raster)
+    # Warn if user asked to write HAND but also supplied one
+    if hand_out and hand_raster is not None:
+        log.warning('hand_out=True ignored because hand_raster was provided.')
+
+    if isinstance(hand_raster, xr.DataArray):
+        hand_array = hand_raster.to_masked_array()
+        hand_source = 'provided xarray'
+
+    elif isinstance(hand_raster, (str, Path)):
+        hand_array = read_as_masked_array(hand_raster)
+        hand_source = f'provided raster: {hand_raster}'
+
+    else:
+        if hand_out:
+            out_path = str(Path(out_raster).with_suffix('')) + '_HAND.tif'
+            log.info(f'Extracting HAND data to: {out_path}')
+
+        hand_xr = prepare_hand_for_raster(
+            source_raster=vh_raster,
+            hand_raster=out_path,
+            return_xarray=True,
+        )
+        hand_array = hand_xr.to_masked_array()
+        hand_source = 'computed xarray'
+
+    if out_path is not None:
+        log.info(f'Determining HAND memberships from {hand_source}, which is also written out to {out_path}')
+    else:
+        log.info(f'Determining HAND memberships from {hand_source}')
+
     hand_tiles = tile_array(hand_array, tile_shape=tile_shape, pad_value=np.nan)
-
     hand_candidates = select_hand_tiles(hand_tiles, hand_threshold, hand_fraction)
     log.debug(f'Selected HAND tile candidates {hand_candidates}')
 
@@ -280,7 +306,7 @@ def make_water_map(
     for max_db_threshold, raster, pol in ((max_vh_threshold, vh_raster, 'VH'), (max_vv_threshold, vv_raster, 'VV')):
         log.info(f'Creating initial {pol} water extent map from {raster}')
 
-        if isinstance(vh_raster, xr.core.dataarray.DataArray):
+        if isinstance(vh_raster, xr.DataArray):
             array = raster.to_masked_array()
         else:
             array = read_as_masked_array(raster)
